@@ -1,1 +1,4 @@
 node_modules
+!screens/.keep
+!components/.keep
+!!navigation/.keep
