@@ -1,4 +1,2 @@
 node_modules
-!src/screens/.keep
-!src/components/.keep
-!src/navigation/.keep
+.DS_Store
