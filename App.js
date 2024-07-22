@@ -1,11 +1,17 @@
 // App.js
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from './src/global';
+import useFonts from './src/hooks/useFonts';
 import StackNavigator from './src/navigation/StackNavigator';
 
-
 export default function App() {
+  
+  const fontsLoaded = useFonts();
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <>
       <StackNavigator />
