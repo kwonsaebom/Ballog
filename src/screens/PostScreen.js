@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components/native";
 import { colors, fonts } from "../global";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import RNPickerSelect from "react-native-picker-select";
+import { TextInput } from "react-native";
 
 const PostScreen = () => {
-  // State to manage the selected value
   const [selectedValue, setSelectedValue] = useState("blog");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
   return (
     <Container>
@@ -52,6 +54,20 @@ const PostScreen = () => {
           <ButtonText>등록하기</ButtonText>
         </PostButton>
       </Bar>
+
+      <ContentContainer>
+        <TitleInput
+          placeholder="제목을 입력해주세요."
+          value={title}
+          onChangeText={setTitle}
+        />
+        <ContentInput
+          placeholder="본문을 입력하세요."
+          value={content}
+          onChangeText={setContent}
+          multiline
+        />
+      </ContentContainer>
     </Container>
   );
 };
@@ -83,6 +99,30 @@ const PostButton = styled.TouchableOpacity`
   height: 30px;
   justify-content: center;
   align-items: center;
+`;
+
+const ContentContainer = styled.View`
+  padding: 16px;
+`;
+
+const TitleInput = styled.TextInput`
+  font-size: ${fonts.sizes.small};
+  font-weight: ${fonts.weights.bold};
+  color: ${colors.placeholder};
+  padding: 10px 15px;
+  border: 1px solid ${colors.border};
+  border-radius: 32px;
+  margin-bottom: 16px;
+`;
+
+const ContentInput = styled.TextInput`
+  font-size: ${fonts.sizes.small};
+  font-weight: ${fonts.weights.bold};
+  color: ${colors.placeholder};
+  padding: 10px 15px;
+  border: 1px solid ${colors.border};
+  border-radius: 14px;
+  height: 200px;
 `;
 
 const ButtonText = styled.Text`

@@ -4,6 +4,8 @@ export const colors = {
   secondory: "#CECECE",
   text: "#000000",
   background: "#FFFFFF",
+  placeholder: "#919191",
+  border: "#d9d9d9",
 };
 
 export const fonts = {
