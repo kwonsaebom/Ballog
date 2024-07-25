@@ -3,12 +3,20 @@ import styled from "styled-components/native";
 import { colors, fonts } from "../global";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import RNPickerSelect from "react-native-picker-select";
-import { TextInput } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const PostScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [gameDate, setGameDate] = useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const handleConfirm = (date) => {
+    setGameDate(date);
+    setDatePickerVisibility(false);
+  };
 
   return (
     <Container>
@@ -19,13 +27,13 @@ const PostScreen = () => {
         <DropdownContainer>
           <DropdownTouchable>
             <RNPickerSelect
-              value={selectedValue} // Set the default value here
+              value={selectedValue}
               items={[
                 { label: "BLOG", value: "blog" },
                 { label: "MVP", value: "mvp" },
               ]}
               onValueChange={(value) => {
-                setSelectedValue(value); // Update state when a new value is selected
+                setSelectedValue(value);
               }}
               style={{
                 inputIOS: {
@@ -61,11 +69,25 @@ const PostScreen = () => {
           value={title}
           onChangeText={setTitle}
         />
+        <ResultContainer>
+          <ResultButton onPress={() => setDatePickerVisibility(true)}>
+            <ResultText>
+              {gameDate ? gameDate.toLocaleString() : "경기 결과를 추가하세요."}
+            </ResultText>
+            <FontAwesome5 name="calendar-alt" size={24} />
+          </ResultButton>
+        </ResultContainer>
         <ContentInput
           placeholder="본문을 입력하세요."
           value={content}
           onChangeText={setContent}
           multiline
+        />
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="datetime"
+          onConfirm={handleConfirm}
+          onCancel={() => setDatePickerVisibility(false)}
         />
       </ContentContainer>
     </Container>
@@ -115,6 +137,26 @@ const TitleInput = styled.TextInput`
   margin-bottom: 16px;
 `;
 
+const ResultContainer = styled.View`
+  border: 1px solid ${colors.border};
+  border-radius: 16px;
+  margin-bottom: 16px;
+`;
+
+const ResultButton = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 15px;
+  height: 75px;
+`;
+
+const ResultText = styled.Text`
+  font-size: ${fonts.sizes.small};
+  font-weight: ${fonts.weights.bold};
+  color: #b4b4b4;
+  flex: 1;
+`;
+
 const ContentInput = styled.TextInput`
   font-size: ${fonts.sizes.small};
   font-weight: ${fonts.weights.bold};
@@ -122,7 +164,7 @@ const ContentInput = styled.TextInput`
   padding: 10px 15px;
   border: 1px solid ${colors.border};
   border-radius: 14px;
-  height: 200px;
+  height: 400px;
 `;
 
 const ButtonText = styled.Text`
