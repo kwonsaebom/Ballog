@@ -392,9 +392,7 @@ const PostScreen = () => {
                         key={sizeName}
                         onPress={() => applySize(sizeOptions[sizeName])}
                       >
-                        <Text style={{ fontSize: sizeOptions[sizeName] }}>
-                          {sizeName}
-                        </Text>
+                        <Text style={{ fontSize: "13px" }}>{sizeName}</Text>
                       </OptionButton>
                     ))}
                   </BorderBox>
