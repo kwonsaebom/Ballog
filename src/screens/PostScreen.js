@@ -20,6 +20,8 @@ import {
   TextInput,
   Image,
   ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 const PostScreen = () => {
@@ -31,7 +33,11 @@ const PostScreen = () => {
   const [image, setImage] = useState(null);
   const [showTextOptions, setShowTextOptions] = useState(false);
   const [showLineSpacingOptions, setShowLineSpacingOptions] = useState(false);
+  const [showColorOptions, setShowColorOptions] = useState(false);
+  const [showSizeOptions, setShowSizeOptions] = useState(false); // 추가된 상태
   const [textAlign, setTextAlign] = useState("left");
+  const [textColor, setTextColor] = useState(colors.text);
+  const [textSize, setTextSize] = useState(fonts.sizes.small); // 기본 글자 크기
 
   useEffect(() => {
     (async () => {
@@ -44,6 +50,17 @@ const PostScreen = () => {
       }
     })();
   }, []);
+
+  const getPlaceholderText = () => {
+    switch (selectedValue) {
+      case "blog":
+        return "제목을 입력해주세요.";
+      case "mvp":
+        return "선수 이름을 입력하세요";
+      default:
+        return "제목을 입력해주세요."; // 기본 placeholder
+    }
+  };
 
   const handleConfirm = (date) => {
     setGameDate(date);
@@ -66,12 +83,30 @@ const PostScreen = () => {
 
   const toggleTextOptions = () => {
     setShowTextOptions(!showTextOptions);
-    setShowLineSpacingOptions(false); // Ensure line spacing options are hidden
+    setShowLineSpacingOptions(false);
+    setShowColorOptions(false);
+    setShowSizeOptions(false); // 사이즈 옵션 숨기기
   };
 
   const toggleLineSpacingOptions = () => {
     setShowLineSpacingOptions(!showLineSpacingOptions);
-    setShowTextOptions(false); // Ensure text options are hidden
+    setShowTextOptions(false);
+    setShowColorOptions(false);
+    setShowSizeOptions(false); // 사이즈 옵션 숨기기
+  };
+
+  const toggleColorOptions = () => {
+    setShowColorOptions(!showColorOptions);
+    setShowTextOptions(false);
+    setShowLineSpacingOptions(false);
+    setShowSizeOptions(false); // 사이즈 옵션 숨기기
+  };
+
+  const toggleSizeOptions = () => {
+    setShowSizeOptions(!showSizeOptions);
+    setShowTextOptions(false);
+    setShowLineSpacingOptions(false);
+    setShowColorOptions(false); // 색상 옵션 숨기기
   };
 
   const applyStyle = (style) => {
@@ -88,157 +123,290 @@ const PostScreen = () => {
     setTextAlign(alignment);
   };
 
+  const applyColor = (color) => {
+    setTextColor(color);
+  };
+
+  const applySize = (size) => {
+    setTextSize(size);
+  };
+
+  const colorOptions = {
+    black: "#000000",
+    red: "#FF0000",
+    blue: "#00008b",
+    yellow: "#FFD300",
+    green: "#008000",
+  };
+
+  const sizeOptions = {
+    10: "10px",
+    12: "12px",
+    14: "14px",
+    16: "16px",
+    18: "18px",
+    20: "20px",
+    25: "25px",
+    30: "30px",
+  };
+
   return (
-    <Container>
-      <Bar>
-        <CloseButton>
-          <AntDesign name="close" size={24} color="#33363f" />
-        </CloseButton>
-        <DropdownContainer>
-          <DropdownTouchable>
-            <RNPickerSelect
-              value={selectedValue}
-              items={[
-                { label: "BLOG", value: "blog" },
-                { label: "MVP", value: "mvp" },
-              ]}
-              onValueChange={(value) => setSelectedValue(value)}
-              style={{
-                inputIOS: {
-                  fontSize: fonts.sizes.medium,
-                  fontWeight: fonts.weights.regular,
-                  color: colors.text,
-                  padding: 10,
-                },
-                inputAndroid: {
-                  fontSize: fonts.sizes.medium,
-                  fontWeight: fonts.weights.regular,
-                  color: colors.text,
-                  padding: 10,
-                },
-              }}
-            />
-            <AntDesign
-              name="caretdown"
-              size={12}
-              color="black"
-              style={{ marginLeft: 5, marginTop: -3 }}
-            />
-          </DropdownTouchable>
-        </DropdownContainer>
-        <PostButton>
-          <ButtonText>등록하기</ButtonText>
-        </PostButton>
-      </Bar>
-
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <ContentContainer>
-          <TitleInput
-            placeholder="제목을 입력해주세요."
-            value={title}
-            onChangeText={setTitle}
-          />
-          <ResultContainer>
-            <ResultButton onPress={() => setDatePickerVisibility(true)}>
-              <ResultText>
-                {gameDate
-                  ? gameDate.toLocaleString()
-                  : "경기 결과를 추가하세요."}
-              </ResultText>
-              <FontAwesome5 name="calendar-alt" size={24} color={colors.icon} />
-            </ResultButton>
-          </ResultContainer>
-
-          <ContentInput
-            placeholder="본문을 입력하세요."
-            value={content}
-            onChangeText={setContent}
-            multiline
-            style={{ textAlign }} // Apply text alignment here
-          />
-
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="datetime"
-            onConfirm={handleConfirm}
-            onCancel={() => setDatePickerVisibility(false)}
-          />
-
-          <ElementContainer>
-            <PhotoButton onPress={pickImage}>
-              <Feather name="camera" size={24} color={colors.icon} />
-            </PhotoButton>
-            <TextButton onPress={toggleTextOptions}>
-              <Ionicons name="text" size={24} color={colors.icon} />
-            </TextButton>
-            <AlignButton onPress={toggleLineSpacingOptions}>
-              <Feather name="align-left" size={24} color={colors.icon} />
-            </AlignButton>
-            <ColorButton>
-              <Ionicons
-                name="color-palette-outline"
-                size={24}
-                color={colors.icon}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <Container>
+        <Bar>
+          <CloseButton>
+            <AntDesign name="close" size={24} color="#33363f" />
+          </CloseButton>
+          <DropdownContainer>
+            <DropdownTouchable>
+              <RNPickerSelect
+                value={selectedValue}
+                items={[
+                  { label: "BLOG", value: "blog" },
+                  { label: "MVP", value: "mvp" },
+                ]}
+                onValueChange={(value) => setSelectedValue(value)}
+                style={{
+                  inputIOS: {
+                    fontSize: fonts.sizes.medium,
+                    fontWeight: fonts.weights.regular,
+                    color: colors.text,
+                    padding: 10,
+                  },
+                  inputAndroid: {
+                    fontSize: fonts.sizes.medium,
+                    fontWeight: fonts.weights.regular,
+                    color: colors.text,
+                    padding: 10,
+                  },
+                }}
               />
-            </ColorButton>
-          </ElementContainer>
+              <AntDesign
+                name="caretdown"
+                size={12}
+                color="black"
+                style={{ marginLeft: 5, marginTop: -3 }}
+              />
+            </DropdownTouchable>
+          </DropdownContainer>
+          <PostButton>
+            <ButtonText>등록하기</ButtonText>
+          </PostButton>
+        </Bar>
 
-          {showTextOptions && (
-            <OptionsContainer>
-              <TextBar>
-                <OptionText>텍스트 옵션</OptionText>
-                <CloseButton onPress={toggleTextOptions}>
-                  <AntDesign name="close" size={18} color="#33363f" />
-                </CloseButton>
-              </TextBar>
-              <OptionBar>
-                <BorderBox>
-                  <OptionButton onPress={() => applyStyle("bold")}>
-                    <FontAwesome6 name="bold" size={20} color={colors.icon} />
-                  </OptionButton>
-                  <OptionButton onPress={() => applyStyle("italic")}>
-                    <FontAwesome name="italic" size={20} color={colors.icon} />
-                  </OptionButton>
-                  <OptionButton onPress={() => applyStyle("underline")}>
-                    <Fontisto name="underline" size={20} color={colors.icon} />
-                  </OptionButton>
-                </BorderBox>
-              </OptionBar>
-            </OptionsContainer>
-          )}
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <ContentContainer>
+            <TitleInput
+              placeholder={getPlaceholderText()}
+              value={title}
+              onChangeText={setTitle}
+            />
 
-          {showLineSpacingOptions && (
-            <OptionsContainer>
-              <TextBar>
-                <OptionText>텍스트 정렬 옵션</OptionText>
-                <CloseButton onPress={toggleLineSpacingOptions}>
-                  <AntDesign name="close" size={18} color="#33363f" />
-                </CloseButton>
-              </TextBar>
-              <OptionBar>
-                <BorderBox>
-                  <OptionButton onPress={() => applyAlign("left")}>
-                    <Feather name="align-left" size={20} color={colors.icon} />
-                  </OptionButton>
-                  <OptionButton onPress={() => applyAlign("center")}>
-                    <Feather
-                      name="align-center"
-                      size={20}
-                      color={colors.icon}
-                    />
-                  </OptionButton>
-                  <OptionButton onPress={() => applyAlign("right")}>
-                    <Feather name="align-right" size={20} color={colors.icon} />
-                  </OptionButton>
-                </BorderBox>
-              </OptionBar>
-            </OptionsContainer>
-          )}
+            {selectedValue === "mvp" && (
+              <PlayerContainer>
+                <PlayerText>선수 사진을 업로드 하세요.</PlayerText>
+                <PlayerButton>
+                  <Feather name="camera" size={24} color={colors.icon} />
+                </PlayerButton>
+              </PlayerContainer>
+            )}
+            <ResultContainer>
+              <ResultButton onPress={() => setDatePickerVisibility(true)}>
+                <ResultText>
+                  {gameDate
+                    ? gameDate.toLocaleString()
+                    : "경기 결과를 추가하세요."}
+                </ResultText>
+                <FontAwesome5
+                  name="calendar-alt"
+                  size={24}
+                  color={colors.icon}
+                />
+              </ResultButton>
+            </ResultContainer>
 
-          {image && <ImagePreview source={{ uri: image }} />}
-        </ContentContainer>
-      </ScrollView>
-    </Container>
+            <ContentInput
+              placeholder={
+                selectedValue === "blog"
+                  ? "본문을 입력하세요."
+                  : "오늘의 기록을 입력하세요."
+              }
+              value={content}
+              onChangeText={setContent}
+              multiline
+              color={textColor}
+              style={{ textAlign, color: textColor, fontSize: textSize }} // 적용된 글자색 및 크기
+            />
+
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="datetime"
+              onConfirm={handleConfirm}
+              onCancel={() => setDatePickerVisibility(false)}
+            />
+
+            <ElementContainer>
+              <PhotoButton onPress={pickImage}>
+                <Feather name="camera" size={24} color={colors.icon} />
+              </PhotoButton>
+              <TextButton onPress={toggleTextOptions}>
+                <Ionicons name="text" size={24} color={colors.icon} />
+              </TextButton>
+              <AlignButton onPress={toggleLineSpacingOptions}>
+                <Feather name="align-left" size={24} color={colors.icon} />
+              </AlignButton>
+              <ColorButton onPress={toggleColorOptions}>
+                <Ionicons
+                  name="color-palette-outline"
+                  size={24}
+                  color={colors.icon}
+                />
+              </ColorButton>
+              <SizeButton onPress={toggleSizeOptions}>
+                <FontAwesome name="text-height" size={24} color="black" />
+              </SizeButton>
+            </ElementContainer>
+
+            {showTextOptions && (
+              <OptionsContainer>
+                <TextBar>
+                  <OptionText>텍스트 옵션</OptionText>
+                  <CloseButton onPress={toggleTextOptions}>
+                    <AntDesign name="close" size={18} color="#33363f" />
+                  </CloseButton>
+                </TextBar>
+                <OptionBar>
+                  <BorderBox>
+                    <OptionButton onPress={() => applyStyle("bold")}>
+                      <FontAwesome6 name="bold" size={20} color={colors.icon} />
+                    </OptionButton>
+                    <OptionButton onPress={() => applyStyle("italic")}>
+                      <FontAwesome
+                        name="italic"
+                        size={20}
+                        color={colors.icon}
+                      />
+                    </OptionButton>
+                    <OptionButton onPress={() => applyStyle("underline")}>
+                      <Fontisto
+                        name="underline"
+                        size={20}
+                        color={colors.icon}
+                      />
+                    </OptionButton>
+                  </BorderBox>
+                </OptionBar>
+              </OptionsContainer>
+            )}
+
+            {showLineSpacingOptions && (
+              <OptionsContainer>
+                <TextBar>
+                  <OptionText>텍스트 정렬 옵션</OptionText>
+                  <CloseButton onPress={toggleLineSpacingOptions}>
+                    <AntDesign name="close" size={18} color="#33363f" />
+                  </CloseButton>
+                </TextBar>
+                <OptionBar>
+                  <BorderBox>
+                    <OptionButton onPress={() => applyAlign("left")}>
+                      <Feather
+                        name="align-left"
+                        size={20}
+                        color={
+                          textAlign === "left" ? colors.primary : colors.icon
+                        }
+                      />
+                    </OptionButton>
+                    <OptionButton onPress={() => applyAlign("center")}>
+                      <Feather
+                        name="align-center"
+                        size={20}
+                        color={
+                          textAlign === "center" ? colors.primary : colors.icon
+                        }
+                      />
+                    </OptionButton>
+                    <OptionButton onPress={() => applyAlign("right")}>
+                      <Feather
+                        name="align-right"
+                        size={20}
+                        color={
+                          textAlign === "right" ? colors.primary : colors.icon
+                        }
+                      />
+                    </OptionButton>
+                    <OptionButton onPress={() => applyAlign("justify")}>
+                      <Feather
+                        name="align-justify"
+                        size={20}
+                        color={
+                          textAlign === "justify" ? colors.primary : colors.icon
+                        }
+                      />
+                    </OptionButton>
+                  </BorderBox>
+                </OptionBar>
+              </OptionsContainer>
+            )}
+
+            {showColorOptions && (
+              <OptionsContainer>
+                <TextBar>
+                  <OptionText>색상 옵션</OptionText>
+                  <CloseButton onPress={toggleColorOptions}>
+                    <AntDesign name="close" size={18} color="#33363f" />
+                  </CloseButton>
+                </TextBar>
+                <OptionBar>
+                  <BorderBox>
+                    {Object.keys(colorOptions).map((colorName) => (
+                      <OptionButton
+                        key={colorName}
+                        onPress={() => applyColor(colorOptions[colorName])}
+                      >
+                        <Ionicons
+                          name="color-fill"
+                          size={24}
+                          color={colorOptions[colorName]}
+                        />
+                      </OptionButton>
+                    ))}
+                  </BorderBox>
+                </OptionBar>
+              </OptionsContainer>
+            )}
+
+            {showSizeOptions && (
+              <OptionsContainer>
+                <TextBar>
+                  <OptionText>크기 옵션</OptionText>
+                  <CloseButton onPress={toggleSizeOptions}>
+                    <AntDesign name="close" size={18} color="#33363f" />
+                  </CloseButton>
+                </TextBar>
+                <OptionBar>
+                  <BorderBox>
+                    {Object.keys(sizeOptions).map((sizeName) => (
+                      <OptionButton
+                        key={sizeName}
+                        onPress={() => applySize(sizeOptions[sizeName])}
+                      >
+                        <Text style={{ fontSize: sizeOptions[sizeName] }}>
+                          {sizeName}
+                        </Text>
+                      </OptionButton>
+                    ))}
+                  </BorderBox>
+                </OptionBar>
+              </OptionsContainer>
+            )}
+
+            {image && <ImagePreview source={{ uri: image }} />}
+          </ContentContainer>
+        </ScrollView>
+      </Container>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -287,17 +455,29 @@ const TitleInput = styled.TextInput`
   margin-bottom: 16px;
 `;
 
+const PlayerContainer = styled.View`
+  flex-direction: row;
+  padding: 16px;
+  border: 1px solid ${colors.border};
+  border-radius: 16px;
+  margin-bottom: 16px;
+  justify-content: space-between;
+`;
+
+const PlayerText = styled.Text`
+  font-size: ${fonts.sizes.small};
+  font-weight: ${fonts.weights.bold};
+  color: #b4b4b4;
+`;
+
+const PlayerButton = styled.TouchableOpacity`
+  flex-direction: row;
+`;
+
 const ResultContainer = styled.View`
   border: 1px solid ${colors.border};
   border-radius: 16px;
   margin-bottom: 16px;
-`;
-
-const ResultButton = styled.TouchableOpacity`
-  flex-direction: row;
-  align-items: center;
-  padding: 10px 15px;
-  height: 75px;
 `;
 
 const ResultText = styled.Text`
@@ -307,10 +487,16 @@ const ResultText = styled.Text`
   flex: 1;
 `;
 
+const ResultButton = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 15px;
+  height: 75px;
+`;
+
 const ContentInput = styled.TextInput`
   font-size: ${fonts.sizes.small};
   font-weight: ${fonts.weights.bold};
-  color: ${colors.placeholder};
   padding: 10px 15px;
   border: 1px solid ${colors.border};
   border-radius: 14px;
@@ -331,10 +517,14 @@ const TextButton = styled.TouchableOpacity`
 `;
 
 const AlignButton = styled.TouchableOpacity`
+  padding-right: 7px;
+`;
+
+const ColorButton = styled.TouchableOpacity`
   padding-right: 8px;
 `;
 
-const ColorButton = styled.TouchableOpacity``;
+const SizeButton = styled.TouchableOpacity``;
 
 const ImagePreview = styled.Image`
   width: 100%;
