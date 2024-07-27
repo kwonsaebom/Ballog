@@ -6,13 +6,15 @@ export const colors = {
   background: "#FFFFFF",
   placeholder: "#919191",
   border: "#d9d9d9",
+  icon: "#222222",
 };
 
 export const fonts = {
   sizes: {
-    tiny: "10px",
+    tiny: "9px",
+    mini: "10px",
     small: "13px",
-    midium: "14px",
+    medium: "14px",
     big: "20px",
   },
   weights: {
