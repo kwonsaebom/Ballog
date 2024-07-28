@@ -9,7 +9,7 @@ const StartPage = () => {
     const navigation = useNavigation(); // Initialize navigation
 
     const onPressHandler = () => {
-        navigation.navigate('ProfileImage'); // Navigate to LoginPage
+        navigation.navigate('Login'); // Navigate to LoginPage
     };
 
     return (

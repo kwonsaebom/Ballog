@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { colors } from '../global';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const TeamSelect = () => {
   const [selectedOption, setSelectedOption] = useState(null);
@@ -18,9 +19,11 @@ const TeamSelect = () => {
     { label: '키움 히어로즈', image: require('../assets/Teams/Kiwoom.png') },
   ];
 
-  const onPressHandler = () => {
-    console.log("Selected Option:", selectedOption);
-  };
+  const navigation = useNavigation(); // Initialize navigation
+
+    const onPressHandler = () => {
+        navigation.navigate('MainTabs'); // Navigate to LoginPage
+    };
 
   return (
     <View style={styles.wrapper}>

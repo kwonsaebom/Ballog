@@ -22,12 +22,13 @@ const StackNavigator = () => {
           header: () => <Header />,  // 커스텀 헤더를 적용
         }}
       >
+        <Stack.Screen name="StartPage" component={StartPage} options={{ headerShown: false }} />
         <Stack.Screen
           name="MainTabs"
           component={BottomTabNavigator}
           options={{ headerShown: true }}  // 커스텀 헤더를 보이도록 설정
         />
-        <Stack.Screen name="StartPage" component={StartPage} options={{ headerShown: false }} />
+        
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="TeamSelect" component={TeamSelect} options={{ headerShown: false }} />
         <Stack.Screen name="ProfileImage" component={ProfileImage} options={{ headerShown: false }} />

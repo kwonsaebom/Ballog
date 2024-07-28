@@ -1,13 +1,16 @@
 import React from 'react';
 import { colors } from '../global';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const ProfileImage = () => {
   
 
-  const onPressHandler = () => {
-    console.log("Selected Option:");
-  };
+  const navigation = useNavigation(); // Initialize navigation
+
+    const onPressHandler = () => {
+        navigation.navigate('TeamSelect'); // Navigate to LoginPage
+    };
 
   return (
     <View style={styles.wrapper}>
