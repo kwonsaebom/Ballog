@@ -4,6 +4,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from './BottomTabNavigator';
 import Header from '../components/Header';
+import StartPage from '../screens/StartPage'; // StartPage 파일 경로
+import Login from '../screens/Login'; // Login 파일 경로
+import TeamSelect from '../screens/TeamSelect'
+import ProfileImage from '../screens/ProfileImage'
+import SettingScreen from '../screens/SettingScreen';
+import LogoutScreen from '../screens/LogoutScreen';
+import MyPageScreen from '../screens/MyPageScreen';
 
 const Stack = createStackNavigator();
 
@@ -20,6 +27,13 @@ const StackNavigator = () => {
           component={BottomTabNavigator}
           options={{ headerShown: true }}  // 커스텀 헤더를 보이도록 설정
         />
+        <Stack.Screen name="StartPage" component={StartPage} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+        <Stack.Screen name="TeamSelect" component={TeamSelect} options={{ headerShown: false }} />
+        <Stack.Screen name="ProfileImage" component={ProfileImage} options={{ headerShown: false }} />
+        <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: true }} />
+        <Stack.Screen name="LogoutScreen" component={LogoutScreen} options={{ headerShown: true }} />
+        <Stack.Screen name="MyPageScreen" component={MyPageScreen} options={{ headerShown: true }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

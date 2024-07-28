@@ -1,5 +1,6 @@
 // global.js
 export const colors = {
+
   primary: "#C51E3A",
   secondory: "#CECECE",
   text: "#000000",
@@ -24,3 +25,4 @@ export const fonts = {
     extraBold: "1000",
   },
 };
+
