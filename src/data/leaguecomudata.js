@@ -1,4 +1,4 @@
-export const communityData = [
+export const leaguecomuData = [
     { 
         id: 1, 
         username: '홍길동1', 
