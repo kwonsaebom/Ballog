@@ -24,3 +24,4 @@ export const fonts = {
     extraBold: "1000",
   },
 };
+
