@@ -14,7 +14,9 @@ const LogoutScreen = () => {
   const handleLogout = () => {
     setModalVisible(false);
     // 로그아웃 처리 로직 추가 해야함
-    navigation.navigate('MyPageScreen');
+    navigation.navigate("MainTabs", {
+      screen: '마이페이지',
+    });// 하단탭 문제 해결(MainTab에 속한 마이페이지에 해당하는 스크린으로 이동)
   };
 
   const handleCancel = () => {

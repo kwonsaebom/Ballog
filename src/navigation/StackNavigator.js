@@ -11,6 +11,11 @@ import ProfileImage from '../screens/ProfileImage'
 import SettingScreen from '../screens/SettingScreen';
 import LogoutScreen from '../screens/LogoutScreen';
 import MyPageScreen from '../screens/MyPageScreen';
+import CommunityScreen from '../screens/CommunityScreen';
+import ComuWriteScreen from '../screens/ComuWriteScreen';
+import ComuPostedScreen from '../screens/ComuPostedScreen';
+import LeagueComuScreen from '../screens/MyTeamComuScreen';
+import MyTeamComuScreen from '../screens/MyTeamComuScreen';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +40,12 @@ const StackNavigator = () => {
         <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: true }} />
         <Stack.Screen name="LogoutScreen" component={LogoutScreen} options={{ headerShown: true }} />
         <Stack.Screen name="MyPageScreen" component={MyPageScreen} options={{ headerShown: true }} />
+
+        <Stack.Screen name="CommunityScreen" component={CommunityScreen} />
+        <Stack.Screen name="ComuWriteScreen" component={ComuWriteScreen} />
+        <Stack.Screen name="ComuPostedScreen" component={ComuPostedScreen} />
+        <Stack.Screen name="LeagueComuScreen" component={LeagueComuScreen} />
+        <Stack.Screen name="MyTeamComuScreen" component={MyTeamComuScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,19 +1,15 @@
 // HomeScreen.js
-import React, { useState } from "react";
-import styled from "styled-components/native";
-import { playersData } from "../data/playersdata";
-import { blogData } from "../data/blogdata";
-import { getRandomPastelColor } from "../utils/colors";
-import { AntDesign } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, {useState, useMemo} from 'react';
+import styled from 'styled-components/native';
+import { playersData } from '../data/playersdata';
+import { blogData } from '../data/blogdata';
+import { getRandomPastelColor } from '../utils/colors';
+import { AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
+import TeamLogoImg from '../assets/imgs/teamlogo.png';
 
 export default function HomeScreen() {
-  const [playerLikes, setPlayerLikes] = useState(
-    playersData.map((player) => player.likes)
-  );
-  const [blogLikes, setBlogLikes] = useState(
-    blogData.map((blog) => blog.likes)
-  );
+  const [playerLikes, setPlayerLikes] = useState(playersData.map(player => player.likes));
+  const [blogLikes, setBlogLikes] = useState(blogData.map(blog => blog.likes));
 
   const handlePlayerLike = (index) => {
     const newLikes = [...playerLikes];
@@ -27,24 +23,36 @@ export default function HomeScreen() {
     setBlogLikes(newLikes);
   };
 
+  const userCircleColors = useMemo(() => {
+    const colors = {};
+    blogData.forEach(blog => {
+      colors[blog.id] = getRandomPastelColor();
+    });
+    return colors;
+  }, []);
+
   return (
-    <Wrapper>
+    <Wrapper showsVerticalScrollIndicator={false}>
       <MvpContainer>
         <CtgyWrapper>
           <Ctgy>최신 MVP</Ctgy>
-        </CtgyWrapper>
+        </CtgyWrapper> 
         <ScrollContainer horizontal showsHorizontalScrollIndicator={false}>
           <PlayerBox>
             {playersData.map((player, index) => (
-              <PlayerContainer
-                key={player.id}
-                isLast={index === playersData.length - 1}
-              >
+              <PlayerContainer key={player.id} isLast={index === playersData.length - 1}>
                 <PlayerImgWrapper>
                   <PlayerImg source={player.image} />
                   <NameBadge>
                     <BadgeText>{player.name}</BadgeText>
                   </NameBadge>
+                  <LogoBadgeWrapper>
+                    <LogoBadge>
+                      <Square />
+                      <Triangle />
+                    </LogoBadge>
+                    <TeamLogo source={TeamLogoImg} />
+                  </LogoBadgeWrapper>
                 </PlayerImgWrapper>
                 <PlayerInfoWrapper>
                   <PlayerNameWrapper>
@@ -54,17 +62,9 @@ export default function HomeScreen() {
                     <PlayerName>{player.name}</PlayerName>
                   </PlayerNameWrapper>
                   <IconWrapper>
-                    <LikeIcon onPress={() => handlePlayerLike(index)}>
-                      <AntDesign name="hearto" size={10} color="#E05936" />
-                    </LikeIcon>
+                    <LikeIcon onPress={()=>handlePlayerLike(index)}><AntDesign name="hearto" size={10} color="#E05936" /></LikeIcon>
                     <LikeCount>{playerLikes[index]}</LikeCount>
-                    <ChatIcon>
-                      <MaterialCommunityIcons
-                        name="message-reply-outline"
-                        size={10}
-                        color="#8892F7"
-                      />
-                    </ChatIcon>
+                    <ChatIcon><MaterialCommunityIcons name="message-reply-outline" size={10} color="#8892F7" /></ChatIcon>
                     <ChatCount>{player.comments}</ChatCount>
                   </IconWrapper>
                 </PlayerInfoWrapper>
@@ -78,40 +78,36 @@ export default function HomeScreen() {
           <Ctgy>인기 BLOG</Ctgy>
         </CtgyWrapper>
         {blogData.map((blog, index) => (
-          <BlogBox key={blog.id} isFirst={index === 0}>
-            <DetailBox>
-              <UserWrapper>
-                <UserCircle color={getRandomPastelColor()}>
-                  <FirstName>{blog.username.slice(1)}</FirstName>
-                </UserCircle>
-                <UserName>{blog.username}</UserName>
-              </UserWrapper>
-              <DetailWrapper>
-                <BlogTitle numberOfLines={1}>{blog.title}</BlogTitle>
-                <BlogDetail numberOfLines={2}>{blog.detail}</BlogDetail>
-              </DetailWrapper>
-              <BlogFooter>
-                <IconWrapper>
-                  <LikeIcon onPress={() => handleBlogLike(index)}>
-                    <AntDesign name="hearto" size={10} color="#E05936" />
-                  </LikeIcon>
-                  <LikeCount>{blogLikes[index]}</LikeCount>
-                  <ChatIcon>
-                    <MaterialCommunityIcons
-                      name="message-reply-outline"
-                      size={10}
-                      color="#8892F7"
-                    />
-                  </ChatIcon>
-                  <ChatCount>{blog.comments}</ChatCount>
-                </IconWrapper>
-                <DateTime>{`${blog.date} | ${blog.time}`}</DateTime>
-              </BlogFooter>
-            </DetailBox>
-            <ImgBox>
-              <BlogImg source={blog.image} />
-            </ImgBox>
-          </BlogBox>
+        <BlogBox key={blog.id} isFirst={index === 0} isLast={index === blog.length - 1}>
+          <DetailBox>
+            <UserWrapper>
+              <UserCircle color={userCircleColors[blog.id]}>
+                <FirstName>{blog.username.slice(1)}</FirstName>
+              </UserCircle>
+              <UserName>{blog.username}</UserName>
+            </UserWrapper>
+            <DetailWrapper>
+              <BlogTitle numberOfLines={1}>{blog.title}</BlogTitle>
+              <BlogDetail numberOfLines={2}>{blog.detail}</BlogDetail>
+            </DetailWrapper>
+            <BlogFooter>
+              <IconWrapper>
+                <LikeIcon onPress={() => handleBlogLike(index)}>
+                  <AntDesign name="hearto" size={10} color="#E05936" />
+                </LikeIcon>
+                <LikeCount>{blogLikes[index]}</LikeCount>
+                <ChatIcon>
+                  <MaterialCommunityIcons name="message-reply-outline" size={10} color="#8892F7" />
+                </ChatIcon>
+                <ChatCount>{blog.comments}</ChatCount>
+              </IconWrapper>
+              <DateTime>{`${blog.date} | ${blog.time}`}</DateTime>
+            </BlogFooter>
+          </DetailBox>
+          <ImgBox>
+            <BlogImg source={blog.image} />
+          </ImgBox>
+        </BlogBox>
         ))}
       </BlogContainer>
     </Wrapper>
@@ -120,17 +116,19 @@ export default function HomeScreen() {
 
 const Wrapper = styled.ScrollView`
   flex: 1;
-  margin-right: 13px;
-  margin-left: 13px;
+  padding-right: 13px;
+  padding-left: 13px;
+  background-color: #fff;
 `;
 
 const MvpContainer = styled.View`
   margin-top: 20px;
   width: 100%;
+  height: auto;
 `;
 
 const CtgyWrapper = styled.View`
-  background-color: #c51e3a;
+  background-color: #C51E3A;
   justify-content: center;
   align-items: center;
   width: 91px;
@@ -141,7 +139,7 @@ const CtgyWrapper = styled.View`
 
 const Ctgy = styled.Text`
   font-size: 19px;
-  font-family: "Inter-Bold";
+  font-family: 'Inter-Bold';
   color: #fff;
 `;
 
@@ -154,17 +152,18 @@ const PlayerBox = styled.View`
 `;
 
 const PlayerContainer = styled.View`
-  margin-right: ${(props) => (props.isLast ? "0" : "13px")};
+  margin-right: ${props => props.isLast ? '0' : '13px'};
   align-items: center;
 `;
 
-const PlayerImgWrapper = styled.View``;
+const PlayerImgWrapper = styled.View`
+`;
 
 const PlayerImg = styled.Image`
   width: 113.67px;
   height: 142.93px;
   resize-mode: contain;
-  border-color: #1d467d;
+  border-color: #1D467D;
   border-width: 1px;
   border-radius: 2px;
 `;
@@ -182,16 +181,51 @@ const NameBadge = styled.View`
   border-bottom-width: 42px;
   border-left-color: transparent;
   border-right-color: transparent;
-  border-bottom-color: #1d467d;
+  border-bottom-color: #1D467D;
 `;
 
 const BadgeText = styled.Text`
   position: absolute;
-  color: #ffffff;
+  color: #FFFFFF;
   font-family: Inter-Bold;
   font-size: 18px;
   margin-top: 20px;
   margin-left: 5px;
+`;
+
+const LogoBadgeWrapper = styled.View`
+  position: absolute;
+  width: 22.52px;
+  height: 37.09px;
+  right: 0px;
+  align-items: center;
+`;
+
+const LogoBadge = styled.View`
+`;
+
+const Square = styled.View`
+  background-color: #1D467D;
+  width: 22.52px;
+  height: 28px;
+`;
+
+const Triangle = styled.View`
+  width: 0px;
+  height: 0px;
+  border-left-width: 11.26px;
+  border-left-color: transparent;
+  border-right-width: 11.26px;
+  border-right-color: transparent;
+  border-top-width: 9.09px;
+  border-top-color: #1D467D;
+`;
+
+const TeamLogo = styled.Image`
+  position: absolute;
+  top: 8px;
+  width: 20.08px;
+  height: 17.21px;
 `;
 
 const PlayerInfoWrapper = styled.View`
@@ -199,7 +233,7 @@ const PlayerInfoWrapper = styled.View`
   justify-content: space-between;
   align-items: center;
   width: 113.67px;
-  height: 20px;
+  height: 20px;;
   margin-top: 5px;
 `;
 
@@ -213,20 +247,20 @@ const PlayerCircle = styled.View`
   width: 19px;
   height: 19px;
   border-radius: 15px;
-  background-color: #e2b066;
+  background-color: #E2B066;
   justify-content: center;
   align-items: center;
   margin-right: 5px;
 `;
 
 const FirstName = styled.Text`
-  font-family: "Inter-Bold";
+  font-family: 'Inter-Bold';
   font-size: 8px;
   color: #fff;
 `;
 
 const PlayerName = styled.Text`
-  font-family: "Inter-Bold";
+  font-family: 'Inter-Bold';
   font-size: 11px;
 `;
 
@@ -240,14 +274,14 @@ const LikeIcon = styled.TouchableOpacity``;
 const ChatIcon = styled.View``;
 
 const LikeCount = styled.Text`
-  color: #e05936;
+  color: #E05936;
   margin-right: 5px;
   margin-left: 2px;
   font-size: 11px;
 `;
 
 const ChatCount = styled.Text`
-  color: #8892f7;
+  color: #8892F7;
   font-size: 11px;
   padding-right: 1px;
   margin-left: 2px;
@@ -255,19 +289,20 @@ const ChatCount = styled.Text`
 
 const BlogContainer = styled.View`
   margin-top: 30px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 `;
 
-const BlogBox = styled.View`
-  border-top-width: ${(props) => (props.isFirst ? "0.5px" : "0")};
-  border-top-color: #cccccc;
-  border-bottom-width: 0.5px;
-  border-bottom-color: #cccccc;
+const BlogBox = styled.TouchableOpacity`
+  border-top-width: ${props => (props.isFirst ? '0.5px' : '0')};
+  border-top-color: #CCCCCC;
+  border-bottom-width: ${props => (props.isLast ? '0' : '0.5px')};
+  border-bottom-color: #CCCCCC;
   width: 100%;
   height: 120px;
   padding: 12px;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const DetailBox = styled.View`
@@ -302,7 +337,7 @@ const UserCircle = styled.View`
 `;
 
 const UserName = styled.Text`
-  font-family: "Inter-Bold";
+  font-family: 'Inter-Bold';
   font-size: 11px;
 `;
 
@@ -312,13 +347,13 @@ const DetailWrapper = styled.View`
 `;
 
 const BlogTitle = styled.Text`
-  font-family: "Inter-Bold";
+  font-family: 'Inter-Bold';
   font-size: 16px;
   margin-bottom: 2px;
 `;
 
 const BlogDetail = styled.Text`
-  font-family: "Inter-Regular";
+  font-family: 'Inter-Regular';
   font-size: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -330,6 +365,6 @@ const BlogFooter = styled.View`
 `;
 
 const DateTime = styled.Text`
-  color: #aaaaaa;
+  color: #AAAAAA;
   font-size: 11px;
 `;
