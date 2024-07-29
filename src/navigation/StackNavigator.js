@@ -14,7 +14,7 @@ import MyPageScreen from '../screens/MyPageScreen';
 import CommunityScreen from '../screens/CommunityScreen';
 import ComuWriteScreen from '../screens/ComuWriteScreen';
 import ComuPostedScreen from '../screens/ComuPostedScreen';
-import LeagueComuScreen from '../screens/MyTeamComuScreen';
+import LeagueComuScreen from '../screens/LeagueComuScreen';
 import MyTeamComuScreen from '../screens/MyTeamComuScreen';
 
 const Stack = createStackNavigator();

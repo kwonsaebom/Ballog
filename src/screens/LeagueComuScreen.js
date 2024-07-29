@@ -173,7 +173,6 @@ const DefaultTextWrapper = styled.View`
   height: 80%;
 `;
 
-
 const DefaultText = styled.Text`
   font-family: 'Inter-Regular';
 `;

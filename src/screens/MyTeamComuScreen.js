@@ -85,30 +85,30 @@ const ComuBox = styled.TouchableOpacity`
   height: 80px;
   padding-right: 12px;
   padding-left: 12px;
-  padding-top: 2px;
-  padding-bottom: 2px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
 `;
 
 const DetailBox = styled.View`
   justify-content: center;
-  width: ${({ hasImage }) => (hasImage ? '260px' : '100%')};
-  padding-right: 10px;
+  width: ${({ hasImage }) => (hasImage ? '76%' : '100%')};
+  height: auto;
   margin-top: 12px;
   margin-bottom: 12px;
+  gap: 5px;
 `;
 
 const DetailWrapper = styled.View`
-  margin-top: 5px;
-  margin-bottom: 5px;
+  gap: 5px;
+  width: 100%;
+  height: auto;
 `;
 
 const ComuTitle = styled.Text`
   font-family: 'Inter-Bold';
   font-size: 14px;
-  margin-bottom: 2px;
 `;
 
 const ComuDetail = styled.Text`
@@ -116,13 +116,11 @@ const ComuDetail = styled.Text`
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 3px;
 `;
 
 const ComuImgBox = styled.View`
   justify-content: center;
   align-items: center;
-  margin-left: 10px;
 `;
 
 const ComuImg = styled.Image`
@@ -135,6 +133,8 @@ const ComuImg = styled.Image`
 const ComuFooter = styled.View`
   flex-direction: row;
   align-items: center;
+  width: 100%;
+  height: auto;
 `;
 
 const IconWrapper = styled.View`
@@ -172,7 +172,6 @@ const DefaultTextWrapper = styled.View`
   width: 100%;
   height: 80%;
 `;
-
 
 const DefaultText = styled.Text`
   font-family: 'Inter-Regular';
