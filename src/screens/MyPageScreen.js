@@ -12,6 +12,37 @@ const MyPageScreen = () => {
     navigation.navigate('SettingScreen');
   };
 
+  const onDayPress = (day) => {
+    const selectedDate = day.dateString;
+    const isRedDate = redDates.includes(selectedDate);
+    if (isRedDate) {
+      navigation.navigate('MyPostScreen');
+    } 
+  };
+
+  const redDateStyle = {
+    customStyles: {
+      container: {
+        backgroundColor: '#E8A5B0', // 빨간색 배경
+      },
+      text: {
+        color: 'black', // 검정색 글씨
+      },
+    },
+  };
+
+  // Example red dates
+  const redDates = ['2024-07-01', '2024-07-15', '2024-07-20'];
+  const today = new Date().toISOString().split('T')[0];
+
+  const markedDates = redDates.reduce((acc, date) => {
+    acc[date] = { selected: true, selectedColor: '#E8A5B0' ,
+    };
+    return acc;
+  }, {});
+
+  markedDates[today] = { selected: true, selectedColor: '#CDCDCD' };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -52,7 +83,7 @@ const MyPageScreen = () => {
           <Calendar
             style={styles.calendar}
             theme={calendarTheme}
-            onDayPress={(day) => {console.log(day)}}
+            onDayPress={onDayPress}
             hideExtraDays={true}
             monthFormat={'yyyy / MM'}
             onMonthChange={(month) => {console.log(month)}}
@@ -60,6 +91,7 @@ const MyPageScreen = () => {
               <Image style={styles.arrow} name="left" size={20} source={require('../assets/LeftVector.png')}/> :
               <Image style={styles.arrow} name="right" size={20} source={require('../assets/RightVector.png')} />
             }
+            markedDates={markedDates}
           />
         </ScrollView>
       </View>

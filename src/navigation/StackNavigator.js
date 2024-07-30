@@ -8,9 +8,6 @@ import StartPage from '../screens/StartPage'; // StartPage 파일 경로
 import Login from '../screens/Login'; // Login 파일 경로
 import TeamSelect from '../screens/TeamSelect'
 import ProfileImage from '../screens/ProfileImage'
-import SettingScreen from '../screens/SettingScreen';
-import LogoutScreen from '../screens/LogoutScreen';
-import MyPageScreen from '../screens/MyPageScreen';
 import CommunityScreen from '../screens/CommunityScreen';
 import ComuWriteScreen from '../screens/ComuWriteScreen';
 import ComuPostedScreen from '../screens/ComuPostedScreen';
@@ -37,9 +34,6 @@ const StackNavigator = () => {
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="TeamSelect" component={TeamSelect} options={{ headerShown: false }} />
         <Stack.Screen name="ProfileImage" component={ProfileImage} options={{ headerShown: false }} />
-        <Stack.Screen name="SettingScreen" component={SettingScreen} options={{ headerShown: true }} />
-        <Stack.Screen name="LogoutScreen" component={LogoutScreen} options={{ headerShown: true }} />
-        <Stack.Screen name="MyPageScreen" component={MyPageScreen} options={{ headerShown: true }} />
 
         <Stack.Screen name="CommunityScreen" component={CommunityScreen} />
         <Stack.Screen name="ComuWriteScreen" component={ComuWriteScreen} />
