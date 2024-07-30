@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import ProfileImage from './ProfileImage';
 
 const useCommonNavigation = () => {
     const navigation = useNavigation();
@@ -9,20 +8,25 @@ const useCommonNavigation = () => {
     const navigateTo = (screenName) => {
       navigation.navigate(screenName);
     };
+
+    const navigateBack = () => {
+        navigation.goBack();
+      };
   
     return {
       navigateTo,
+      navigateBack,
     };
   };
 
 const SettingScreen = () => {
 
-    const { navigateTo } = useCommonNavigation();
+    const { navigateTo, navigateBack } = useCommonNavigation();
 
     return (
         <View style={styles.container}>
             <View style={styles.bar}>
-                <TouchableOpacity onPress={() => navigateTo('MyPageScreen')}>
+                <TouchableOpacity onPress={navigateBack}>
                     <Image style={styles.ReturnImage} source={require('../assets/LeftVector.png')} />
                 </TouchableOpacity>
                 <Text style={styles.title}>설정</Text>

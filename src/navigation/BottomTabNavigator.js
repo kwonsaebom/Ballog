@@ -6,6 +6,7 @@ import PostScreen from '../screens/PostScreen';
 import ClipsScreen from '../screens/ClipsScreen';
 import CommunityScreen from '../screens/CommunityScreen';
 import MyPageScreen from '../screens/MyPageScreen';
+import MyPageStackNavigator from './MyPageStackNavigator';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../global'
 
@@ -47,7 +48,7 @@ const BottomTabNavigator = () => {
       <Tab.Screen name="글쓰기" component={PostScreen} />
       <Tab.Screen name="홈" component={HomeScreen} />
       <Tab.Screen name="커뮤니티" component={CommunityScreen} />
-      <Tab.Screen name="마이페이지" component={MyPageScreen} />
+      <Tab.Screen name="마이페이지" component={MyPageStackNavigator} />
     </Tab.Navigator>
   );
 };

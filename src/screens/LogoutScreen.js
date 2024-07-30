@@ -11,12 +11,16 @@ const LogoutScreen = () => {
     setModalVisible(true);
   };
 
+  const navigateBack = () => {
+    navigation.goBack();
+  };
+
   const handleLogout = () => {
     setModalVisible(false);
     // 로그아웃 처리 로직 추가 해야함
     navigation.navigate("MainTabs", {
       screen: '마이페이지',
-    });// 하단탭 문제 해결(MainTab에 속한 마이페이지에 해당하는 스크린으로 이동)
+    });
   };
 
   const handleCancel = () => {
@@ -26,7 +30,7 @@ const LogoutScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.bar}>
-        <TouchableOpacity onPress={() => navigation.navigate('MyPageScreen')}>
+        <TouchableOpacity onPress={navigateBack}>
           <Image style={styles.ReturnImage} source={require('../assets/LeftVector.png')} />
         </TouchableOpacity>
         <Text style={styles.title}>내 계정</Text>
