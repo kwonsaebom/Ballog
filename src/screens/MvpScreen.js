@@ -12,7 +12,6 @@ import {
 } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from "expo-image-picker";
-
 import {
   Text,
   ScrollView,
@@ -26,7 +25,7 @@ const PostScreen = () => {
   const [playerContent, setPlayerContent] = useState("");
   const [gameDate, setGameDate] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]); // 여러 이미지를 저장할 배열 상태
   const [playerImage, setPlayerImage] = useState(null); // 선수 이미지 상태 추가
   const [showTextOptions, setShowTextOptions] = useState(false);
   const [showLineSpacingOptions, setShowLineSpacingOptions] = useState(false);
@@ -35,7 +34,6 @@ const PostScreen = () => {
   const [textAlign, setTextAlign] = useState("left");
   const [textColor, setTextColor] = useState(colors.text);
   const [textSize, setTextSize] = useState(fonts.sizes.small); // 기본 글자 크기
-  const [showImagePreview, setShowImagePreview] = useState(true); // 이미지 프리뷰 상태 추가
 
   useEffect(() => {
     (async () => {
@@ -64,50 +62,40 @@ const PostScreen = () => {
         quality: 1,
       });
 
-      console.log("pickPlayerImage result:", result); // 결과 확인
-
       if (!result.canceled) {
         const uri = result.assets ? result.assets[0].uri : result.uri;
         setPlayerImage(uri);
         setPlayerContent((prevContent) => `${prevContent}\n![Image](${uri})`);
-        setShowImagePreview(true);
       }
     } catch (error) {
       console.error("Error picking player image:", error);
     }
   };
 
-  const pickImage = async () => {
-    console.log("pickImage function called");
+  const pickImages = async () => {
+    console.log("pickImages function called");
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
+        allowsMultipleSelection: true, // 여러 이미지 선택 허용
         quality: 1,
       });
 
-      console.log("pickImage result:", result); // 결과 확인
-
       if (!result.canceled) {
-        const uri = result.assets ? result.assets[0].uri : result.uri;
-        setImage(uri);
-        setContent((prevContent) => `${prevContent}\n![Image](${uri})`);
-        setShowImagePreview(true);
+        const uris = result.assets.map((asset) => asset.uri);
+        setImages((prevImages) => [...prevImages, ...uris]);
       }
     } catch (error) {
-      console.error("Error picking image:", error);
+      console.error("Error picking images:", error);
     }
   };
 
-  const handleRemoveImage = () => {
-    setImage(null);
-    setShowImagePreview(false); // 이미지 프리뷰 상태를 숨깁니다
+  const handleRemoveImage = (uri) => {
+    setImages((prevImages) => prevImages.filter((image) => image !== uri));
   };
 
   const handleRemovePlayerImage = () => {
     setPlayerImage(null);
-    setShowImagePreview(false);
   };
 
   const toggleTextOptions = () => {
@@ -230,7 +218,7 @@ const PostScreen = () => {
             onCancel={() => setDatePickerVisibility(false)}
           />
           <ElementContainer>
-            <PhotoButton onPress={pickImage}>
+            <PhotoButton onPress={pickImages}>
               <Feather name="camera" size={24} color={colors.icon} />
             </PhotoButton>
             <TextButton onPress={toggleTextOptions}>
@@ -373,12 +361,16 @@ const PostScreen = () => {
               </OptionBar>
             </OptionsContainer>
           )}
-          {image && showImagePreview && (
+          {images.length > 0 && (
             <ImagePreviewContainer>
-              <ImagePreview source={{ uri: image }} />
-              <RemoveImageButton onPress={handleRemoveImage}>
-                <AntDesign name="delete" size={24} color={colors.icon} />
-              </RemoveImageButton>
+              {images.map((uri, index) => (
+                <ImagePreviewBox key={index}>
+                  <ImagePreview source={{ uri }} />
+                  <RemoveImageButton onPress={() => handleRemoveImage(uri)}>
+                    <AntDesign name="delete" size={24} color={colors.icon} />
+                  </RemoveImageButton>
+                </ImagePreviewBox>
+              ))}
             </ImagePreviewContainer>
           )}
         </ContentContainer>
@@ -449,7 +441,7 @@ const ContentInput = styled.TextInput`
   padding: 10px 15px;
   border: 1px solid ${colors.border};
   border-radius: 14px;
-  height: 300px;
+  min-height: 200px;
 `;
 
 const ElementContainer = styled.View`
@@ -475,19 +467,29 @@ const ColorButton = styled.TouchableOpacity`
 
 const SizeButton = styled.TouchableOpacity``;
 
-const ImagePreviewContainer = styled.View``;
+const ImagePreviewContainer = styled.ScrollView.attrs({
+  horizontal: true,
+  showsHorizontalScrollIndicator: false,
+})`
+  flex-direction: row;
+  margin-top: 10px;
+`;
+
+const ImagePreviewBox = styled.View`
+  position: relative;
+  padding: 16px 16px 0 0;
+`;
 
 const ImagePreview = styled.Image`
   width: 100px;
   height: 100px;
   border-radius: 8px;
-  position: relative;
 `;
 
 const RemoveImageButton = styled.TouchableOpacity`
   position: absolute;
-  top: 3;
-  left: 93;
+  top: 3px;
+  right: 3px;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 50px;
   padding: 5px;

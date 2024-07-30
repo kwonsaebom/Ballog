@@ -12,7 +12,6 @@ import {
 } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from "expo-image-picker";
-
 import {
   Text,
   ScrollView,
@@ -25,7 +24,7 @@ const PostScreen = () => {
   const [content, setContent] = useState("");
   const [gameDate, setGameDate] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [image, setImage] = useState(null);
+  const [images, setImages] = useState([]); // 여러 이미지를 저장할 배열 상태
   const [showTextOptions, setShowTextOptions] = useState(false);
   const [showLineSpacingOptions, setShowLineSpacingOptions] = useState(false);
   const [showColorOptions, setShowColorOptions] = useState(false);
@@ -33,7 +32,6 @@ const PostScreen = () => {
   const [textAlign, setTextAlign] = useState("left");
   const [textColor, setTextColor] = useState(colors.text);
   const [textSize, setTextSize] = useState(fonts.sizes.small); // 기본 글자 크기
-  const [showImagePreview, setShowImagePreview] = useState(true); // 이미지 프리뷰 상태 추가
 
   useEffect(() => {
     (async () => {
@@ -52,25 +50,26 @@ const PostScreen = () => {
     setDatePickerVisibility(false);
   };
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  const pickImages = async () => {
+    console.log("pickImages function called");
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true, // 여러 이미지 선택 허용
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      const [{ uri }] = result.assets;
-      setImage(uri);
-      setContent((prevContent) => `${prevContent}\n![Image](${uri})`);
-      setShowImagePreview(true); // 이미지 프리뷰 상태를 보이도록 설정
+      if (!result.canceled) {
+        const uris = result.assets.map((asset) => asset.uri);
+        setImages((prevImages) => [...prevImages, ...uris]);
+      }
+    } catch (error) {
+      console.error("Error picking images:", error);
     }
   };
 
-  const handleRemoveImage = () => {
-    setImage(null);
-    setShowImagePreview(false); // 이미지 프리뷰 상태를 숨깁니다
+  const handleRemoveImage = (uri) => {
+    setImages((prevImages) => prevImages.filter((image) => image !== uri));
   };
 
   const toggleTextOptions = () => {
@@ -151,7 +150,6 @@ const PostScreen = () => {
             value={title}
             onChangeText={setTitle}
           />
-
           <ResultContainer>
             <ResultButton onPress={() => setDatePickerVisibility(true)}>
               <ResultText>
@@ -162,25 +160,22 @@ const PostScreen = () => {
               <FontAwesome5 name="calendar-alt" size={24} color={colors.icon} />
             </ResultButton>
           </ResultContainer>
-
           <ContentInput
-            placeholder="본문을 입력하세요."
+            placeholder="오늘의 기록을 입력하세요."
             value={content}
             onChangeText={setContent}
             multiline
             color={textColor}
             style={{ textAlign, color: textColor, fontSize: textSize }} // 적용된 글자색 및 크기
           />
-
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
             mode="datetime"
             onConfirm={handleConfirm}
             onCancel={() => setDatePickerVisibility(false)}
           />
-
           <ElementContainer>
-            <PhotoButton onPress={pickImage}>
+            <PhotoButton onPress={pickImages}>
               <Feather name="camera" size={24} color={colors.icon} />
             </PhotoButton>
             <TextButton onPress={toggleTextOptions}>
@@ -200,7 +195,6 @@ const PostScreen = () => {
               <FontAwesome name="text-height" size={24} color="black" />
             </SizeButton>
           </ElementContainer>
-
           {showTextOptions && (
             <OptionsContainer>
               <TextBar>
@@ -224,7 +218,6 @@ const PostScreen = () => {
               </OptionBar>
             </OptionsContainer>
           )}
-
           {showLineSpacingOptions && (
             <OptionsContainer>
               <TextBar>
@@ -275,7 +268,6 @@ const PostScreen = () => {
               </OptionBar>
             </OptionsContainer>
           )}
-
           {showColorOptions && (
             <OptionsContainer>
               <TextBar>
@@ -302,7 +294,6 @@ const PostScreen = () => {
               </OptionBar>
             </OptionsContainer>
           )}
-
           {showSizeOptions && (
             <OptionsContainer>
               <TextBar>
@@ -327,13 +318,16 @@ const PostScreen = () => {
               </OptionBar>
             </OptionsContainer>
           )}
-
-          {image && showImagePreview && (
+          {images.length > 0 && (
             <ImagePreviewContainer>
-              <ImagePreview source={{ uri: image }} />
-              <RemoveImageButton onPress={handleRemoveImage}>
-                <AntDesign name="delete" size={24} color={colors.icon} />
-              </RemoveImageButton>
+              {images.map((uri, index) => (
+                <ImagePreviewBox key={index}>
+                  <ImagePreview source={{ uri }} />
+                  <RemoveImageButton onPress={() => handleRemoveImage(uri)}>
+                    <AntDesign name="delete" size={24} color={colors.icon} />
+                  </RemoveImageButton>
+                </ImagePreviewBox>
+              ))}
             </ImagePreviewContainer>
           )}
         </ContentContainer>
@@ -384,7 +378,7 @@ const ContentInput = styled.TextInput`
   padding: 10px 15px;
   border: 1px solid ${colors.border};
   border-radius: 14px;
-  height: 300px;
+  min-height: 200px;
 `;
 
 const ElementContainer = styled.View`
@@ -410,20 +404,30 @@ const ColorButton = styled.TouchableOpacity`
 
 const SizeButton = styled.TouchableOpacity``;
 
-const ImagePreviewContainer = styled.View`
+const ImagePreviewContainer = styled.ScrollView.attrs({
+  horizontal: true,
+  showsHorizontalScrollIndicator: false,
+})`
+  flex-direction: row;
+  margin-top: 10px;
+`;
+
+const ImagePreviewBox = styled.View`
   position: relative;
+  padding: 16px 16px 0 0;
 `;
 
 const ImagePreview = styled.Image`
   width: 100px;
   height: 100px;
+  border-radius: 8px;
 `;
 
 const RemoveImageButton = styled.TouchableOpacity`
   position: absolute;
-  top: 0;
-  right: 0;
-  background-color: rgba(255, 255, 255, 0.7);
+  top: 3px;
+  right: 3px;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 50px;
   padding: 5px;
 `;
