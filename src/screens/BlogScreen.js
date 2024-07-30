@@ -28,10 +28,10 @@ const PostScreen = () => {
   const [showTextOptions, setShowTextOptions] = useState(false);
   const [showLineSpacingOptions, setShowLineSpacingOptions] = useState(false);
   const [showColorOptions, setShowColorOptions] = useState(false);
-  const [showSizeOptions, setShowSizeOptions] = useState(false); // 추가된 상태
+  const [showSizeOptions, setShowSizeOptions] = useState(false);
   const [textAlign, setTextAlign] = useState("left");
   const [textColor, setTextColor] = useState(colors.text);
-  const [textSize, setTextSize] = useState(fonts.sizes.small); // 기본 글자 크기
+  const [textSize, setTextSize] = useState(fonts.sizes.small);
 
   useEffect(() => {
     (async () => {
@@ -76,28 +76,28 @@ const PostScreen = () => {
     setShowTextOptions(!showTextOptions);
     setShowLineSpacingOptions(false);
     setShowColorOptions(false);
-    setShowSizeOptions(false); // 사이즈 옵션 숨기기
+    setShowSizeOptions(false);
   };
 
   const toggleLineSpacingOptions = () => {
     setShowLineSpacingOptions(!showLineSpacingOptions);
     setShowTextOptions(false);
     setShowColorOptions(false);
-    setShowSizeOptions(false); // 사이즈 옵션 숨기기
+    setShowSizeOptions(false);
   };
 
   const toggleColorOptions = () => {
     setShowColorOptions(!showColorOptions);
     setShowTextOptions(false);
     setShowLineSpacingOptions(false);
-    setShowSizeOptions(false); // 사이즈 옵션 숨기기
+    setShowSizeOptions(false);
   };
 
   const toggleSizeOptions = () => {
     setShowSizeOptions(!showSizeOptions);
     setShowTextOptions(false);
     setShowLineSpacingOptions(false);
-    setShowColorOptions(false); // 색상 옵션 숨기기
+    setShowColorOptions(false);
   };
 
   const applyStyle = (style) => {
@@ -131,14 +131,11 @@ const PostScreen = () => {
   };
 
   const sizeOptions = {
-    10: "10px",
-    12: "12px",
-    14: "14px",
-    16: "16px",
-    18: "18px",
-    20: "20px",
-    25: "25px",
-    30: "30px",
+    h1: "30px",
+    h2: "25px",
+    h3: "20px",
+    h4: "15px",
+    h5: "10px",
   };
 
   return (
@@ -309,9 +306,7 @@ const PostScreen = () => {
                       key={sizeName}
                       onPress={() => applySize(sizeOptions[sizeName])}
                     >
-                      <Text style={{ fontSize: sizeOptions[sizeName] }}>
-                        {sizeName}
-                      </Text>
+                      <Text style={{ fontSize: "14px" }}>{sizeName}</Text>
                     </OptionButton>
                   ))}
                 </BorderBox>
