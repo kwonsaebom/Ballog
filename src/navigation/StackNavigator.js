@@ -13,6 +13,7 @@ import ComuWriteScreen from '../screens/ComuWriteScreen';
 import ComuPostedScreen from '../screens/ComuPostedScreen';
 import LeagueComuScreen from '../screens/LeagueComuScreen';
 import MyTeamComuScreen from '../screens/MyTeamComuScreen';
+import NotificationScreen from '../screens/NotificationScreen';
 
 const Stack = createStackNavigator();
 
@@ -25,21 +26,16 @@ const StackNavigator = () => {
         }}
       >
         <Stack.Screen name="StartPage" component={StartPage} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="MainTabs"
-          component={BottomTabNavigator}
-          options={{ headerShown: true }}  // 커스텀 헤더를 보이도록 설정
-        />
-        
+        <Stack.Screen name="MainTabs"component={BottomTabNavigator} options={{ headerShown: true }}/> 
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="TeamSelect" component={TeamSelect} options={{ headerShown: false }} />
         <Stack.Screen name="ProfileImage" component={ProfileImage} options={{ headerShown: false }} />
-
         <Stack.Screen name="CommunityScreen" component={CommunityScreen} />
         <Stack.Screen name="ComuWriteScreen" component={ComuWriteScreen} />
         <Stack.Screen name="ComuPostedScreen" component={ComuPostedScreen} />
         <Stack.Screen name="LeagueComuScreen" component={LeagueComuScreen} />
         <Stack.Screen name="MyTeamComuScreen" component={MyTeamComuScreen} />
+        <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

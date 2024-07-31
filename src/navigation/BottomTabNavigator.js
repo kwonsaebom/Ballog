@@ -1,14 +1,13 @@
-// BottomTabNavigator.js
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import PostScreen from '../screens/PostScreen';
 import ClipsScreen from '../screens/ClipsScreen';
 import CommunityScreen from '../screens/CommunityScreen';
-import MyPageScreen from '../screens/MyPageScreen';
 import MyPageStackNavigator from './MyPageStackNavigator';
+import NotificationScreen from '../screens/NotificationScreen';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../global'
+import { colors } from '../global';
 
 const Tab = createBottomTabNavigator();
 
@@ -41,7 +40,7 @@ const BottomTabNavigator = () => {
         tabBarStyle: {
           height: 80,
         },
-        headerShown: false, // 모든 스크린에서 기본 헤더 숨기기 
+        headerShown: false,
       })}
     >
       <Tab.Screen name="경기 짤방" component={ClipsScreen} />

@@ -23,7 +23,7 @@
     "react-dom": "18.2.0",
     "react-native": "0.74.3",
     "react-native-calendars": "^1.1306.0",
-    "react-native-gesture-handler": "^2.17.1",
+    "react-native-gesture-handler": "^2.18.0",
     "react-native-modal": "^13.0.1",
     "react-native-modal-datetime-picker": "^17.1.0",
     "react-native-picker-select": "^9.1.3",
