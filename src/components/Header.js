@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // useNavigation 훅을 임포트
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Platform, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; 
 import { Ionicons } from '@expo/vector-icons';
 
+const { width } = Dimensions.get('window');
+
 const Header = () => {
-  const navigation = useNavigation(); // 네비게이션 객체
+  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -14,7 +16,7 @@ const Header = () => {
           style={styles.notificationIcon}
           onPress={() => navigation.navigate('NotificationScreen')} 
         >
-          <Ionicons name="notifications-outline" size={24} color="black" />
+          <Ionicons name="notifications-outline" size={width * 0.06} color="black" />
         </TouchableOpacity>
       </View>
       <View style={styles.separator} />
@@ -24,6 +26,7 @@ const Header = () => {
 
 const styles = StyleSheet.create({
   safeArea: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     backgroundColor: '#f8f8f8',
   },
   header: {
@@ -31,14 +34,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 40,
-    paddingHorizontal: 10,
+    paddingHorizontal: width * 0.05, 
     backgroundColor: '#f8f8f8',
   },
   logo: {
-    fontSize: 30,
+    fontSize: width * 0.07, 
     fontWeight: '800',
     color: '#b91d47',
-    marginLeft: 10,
   },
   notificationIcon: {
     padding: 5,
