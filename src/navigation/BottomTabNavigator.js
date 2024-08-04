@@ -1,14 +1,15 @@
-// BottomTabNavigator.js
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import PostScreen from '../screens/PostScreen';
 import ClipsScreen from '../screens/ClipsScreen';
 import CommunityScreen from '../screens/CommunityScreen';
-import MyPageScreen from '../screens/MyPageScreen';
 import MyPageStackNavigator from './MyPageStackNavigator';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../global'
+import { colors } from '../global';
+import { Dimensions, Platform } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 const Tab = createBottomTabNavigator();
 
@@ -36,12 +37,13 @@ const BottomTabNavigator = () => {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: 'gray',
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: Platform.OS === 'ios' ? width * 0.03 : width * 0.035, // 폰트 크기
+          marginBottom: Platform.OS === 'android' ? height * 0.01 : 0, // 탭바 내 글씨
         },
         tabBarStyle: {
-          height: 80,
+          height: Platform.OS === 'ios' ? height * 0.1 : height * 0.08, // 탭바 높이
         },
-        headerShown: false, // 모든 스크린에서 기본 헤더 숨기기 
+        headerShown: false,
       })}
     >
       <Tab.Screen name="경기 짤방" component={ClipsScreen} />

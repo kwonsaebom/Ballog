@@ -16,32 +16,34 @@ export default function CommunityScreen({ navigation }) {
 
   return (
     <Wrapper>
-      <CtgyWrapper>
-        <CtgyButton 
-        onPress={() => setSelectedCategory('league')} 
-        isActive={selectedCategory === 'league'}
-        >
-          <CtgyText>리그 커뮤니티</CtgyText>
-          <TextWrapper1 isActive={selectedCategory === 'league'} />
-        </CtgyButton>
-        <CtgyButton 
-        onPress={() => {setSelectedCategory('myteam')}}
-        isActive={selectedCategory === 'myteam'}
-        >
-          <CtgyText>마이팀 커뮤니티</CtgyText>
-          <TextWrapper2 isActive={selectedCategory === 'myteam'} />
-        </CtgyButton>
-      </CtgyWrapper>
-      <InputBoxWrapper>
-        <SearchButton>
-          <Feather name="search" size={16} color="#C51E3A" />
-        </SearchButton>
-        <InputBox 
-        placeholder='글을 입력하여주세요' 
-        placeholderTextColor={'#C51E3A'}
-        multiline
-        />
-      </InputBoxWrapper>
+      <HeaderWrapper>
+        <CtgyWrapper>
+          <CtgyButton 
+          onPress={() => setSelectedCategory('league')} 
+          isActive={selectedCategory === 'league'}
+          >
+            <CtgyText>리그 커뮤니티</CtgyText>
+            <TextWrapper1 isActive={selectedCategory === 'league'} />
+          </CtgyButton>
+          <CtgyButton 
+          onPress={() => {setSelectedCategory('myteam')}}
+          isActive={selectedCategory === 'myteam'}
+          >
+            <CtgyText>마이팀 커뮤니티</CtgyText>
+            <TextWrapper2 isActive={selectedCategory === 'myteam'} />
+          </CtgyButton>
+        </CtgyWrapper>
+        <InputBoxWrapper>
+          <SearchButton>
+            <Feather name="search" size={20} color="#C51E3A" />
+          </SearchButton>
+          <InputBox 
+          placeholder='글을 입력하여주세요' 
+          placeholderTextColor={'#C51E3A'}
+          multiline
+          />
+        </InputBoxWrapper>
+      </HeaderWrapper>
       {selectedCategory === 'league' ? (
         <LeagueComuScreen posts={filteredPosts} />
       ) : (
@@ -62,9 +64,17 @@ const Wrapper = styled.View`
   background-color: #fff;
 `;
 
+const HeaderWrapper = styled.View`
+  margin-right: 13px;
+  margin-left: 13px;
+  padding-bottom: 5px;
+  justify-content: center;
+  align-items: center;
+`;
+
 const CtgyWrapper = styled.View`
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 13px;
 `;
@@ -83,6 +93,7 @@ const TextWrapper1 = styled.View`
   border-bottom-width: ${({ isActive }) => (isActive ? '2px' : '0')};
   border-bottom-color: ${({ isActive }) => (isActive ? '#000000' : 'transparent')};
 `;
+
 const TextWrapper2 = styled.View`
   position: absolute;
   bottom: 5px;
@@ -100,27 +111,25 @@ const CtgyText = styled.Text`
 
 const InputBoxWrapper = styled.View`
   flex-direction: row;
-  padding-right: 10px;
-  padding-left: 10px;
   align-items: center;
+  justify-content: center;
+  padding: 5px;
   border-radius: 20px;
   border-color: #C51E3A;
   border-width: 1px;
-  width: auto;
+  width: 100%;
   height: 34px;
-  margin-bottom: 5px;
-  margin-right: 13px;
-  margin-left: 13px;
+  gap: 5px;
 `;
 
 const InputBox = styled.TextInput`
-  font-size: 15px;
+  font-size: 17px;
   font-family: 'Inter-Regular';
   color: #C51E3A;
-  padding-left: 5px;
-  padding-right: 10px;
-  width: 100%;
-  min-height: 34px;
+  width: 90%;
+  height: auto;
+  align-items: center;
+  justify-content: center;
 `;
 
 const SearchButton = styled.TouchableOpacity`

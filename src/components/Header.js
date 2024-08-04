@@ -1,14 +1,22 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Platform, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; 
 import { Ionicons } from '@expo/vector-icons';
 
+const { width } = Dimensions.get('window');
+
 const Header = () => {
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text style={styles.logo}>Ballog</Text>
-        <TouchableOpacity style={styles.notificationIcon}>
-          <Ionicons name="notifications-outline" size={24} color="black" />
+        <TouchableOpacity
+          style={styles.notificationIcon}
+          onPress={() => navigation.navigate('NotificationScreen')} 
+        >
+          <Ionicons name="notifications-outline" size={width * 0.06} color="black" />
         </TouchableOpacity>
       </View>
       <View style={styles.separator} />
@@ -17,27 +25,27 @@ const Header = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { // 아이폰에서는 다이나믹 아일랜드 양옆
+  safeArea: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     backgroundColor: '#f8f8f8',
   },
-  header: { // 헤더 자체
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     height: 40,
-    paddingHorizontal: 10,
+    paddingHorizontal: width * 0.05, 
     backgroundColor: '#f8f8f8',
   },
-  logo: { // 앱 로고
-    fontSize: 30,
+  logo: {
+    fontSize: width * 0.07, 
     fontWeight: '800',
     color: '#b91d47',
-    marginLeft : 10,
   },
-  notificationIcon: { // 알림
+  notificationIcon: {
     padding: 5,
   },
-  separator: { // 구분선
+  separator: {
     height: 1,
     backgroundColor: '#ddd',
   },

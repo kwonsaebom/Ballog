@@ -40,7 +40,10 @@ export default function HomeScreen() {
         <ScrollContainer horizontal showsHorizontalScrollIndicator={false}>
           <PlayerBox>
             {playersData.map((player, index) => (
-              <PlayerContainer key={player.id} isLast={index === playersData.length - 1}>
+              <PlayerContainer
+               key={player.id} 
+               isLast={index === playersData.length - 1}
+               >
                 <PlayerImgWrapper>
                   <PlayerImg source={player.image} />
                   <NameBadge>
@@ -78,7 +81,11 @@ export default function HomeScreen() {
           <Ctgy>인기 BLOG</Ctgy>
         </CtgyWrapper>
         {blogData.map((blog, index) => (
-        <BlogBox key={blog.id} isFirst={index === 0} isLast={index === blog.length - 1}>
+        <BlogBox
+         key={blog.id} 
+         isFirst={index === 0} 
+         isLast={index === blog.length - 1}
+        >
           <DetailBox>
             <UserWrapper>
               <UserCircle color={userCircleColors[blog.id]}>
@@ -151,7 +158,7 @@ const PlayerBox = styled.View`
   width: auto;
 `;
 
-const PlayerContainer = styled.View`
+const PlayerContainer = styled.TouchableOpacity`
   margin-right: ${props => props.isLast ? '0' : '13px'};
   align-items: center;
 `;
