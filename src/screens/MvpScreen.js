@@ -19,21 +19,21 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-const PostScreen = () => {
+const MVPScreen = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [playerContent, setPlayerContent] = useState("");
   const [gameDate, setGameDate] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [images, setImages] = useState([]); // 여러 이미지를 저장할 배열 상태
+  const [images, setImages] = useState([]);
   const [playerImage, setPlayerImage] = useState(null); // 선수 이미지 상태 추가
   const [showTextOptions, setShowTextOptions] = useState(false);
   const [showLineSpacingOptions, setShowLineSpacingOptions] = useState(false);
   const [showColorOptions, setShowColorOptions] = useState(false);
   const [showSizeOptions, setShowSizeOptions] = useState(false); // 추가된 상태
+  const [textStyle, setTextStyle] = useState({});
   const [textAlign, setTextAlign] = useState("left");
-  const [textColor, setTextColor] = useState(colors.text);
-  const [textSize, setTextSize] = useState(fonts.sizes.small); // 기본 글자 크기
+  const [textColor, setTextColor] = useState("#000000");
+  const [textSize, setTextSize] = useState(13);
 
   useEffect(() => {
     (async () => {
@@ -127,13 +127,10 @@ const PostScreen = () => {
   };
 
   const applyStyle = (style) => {
-    if (style === "bold") {
-      setContent((prevContent) => `${prevContent}**Bold Text**`);
-    } else if (style === "italic") {
-      setContent((prevContent) => `${prevContent}*Italic Text*`);
-    } else if (style === "underline") {
-      setContent((prevContent) => `${prevContent}<u>Underlined Text</u>`);
-    }
+    setTextStyle((prevStyle) => ({
+      ...prevStyle,
+      [style]: prevStyle[style] ? undefined : style,
+    }));
   };
 
   const applyAlign = (alignment) => {
@@ -157,11 +154,11 @@ const PostScreen = () => {
   };
 
   const sizeOptions = {
-    h1: "30px",
-    h2: "25px",
-    h3: "20px",
-    h4: "15px",
-    h5: "10px",
+    h1: 30,
+    h2: 25,
+    h3: 20,
+    h4: 15,
+    h5: 10,
   };
 
   return (
@@ -206,7 +203,14 @@ const PostScreen = () => {
             onChangeText={setContent}
             multiline
             color={textColor}
-            style={{ textAlign, color: textColor, fontSize: textSize }} // 적용된 글자색 및 크기
+            style={{
+              textAlign,
+              fontSize: textSize,
+              color: textColor,
+              fontWeight: textStyle.bold ? "bold" : "normal",
+              fontStyle: textStyle.italic ? "italic" : "normal",
+              textDecorationLine: textStyle.underline ? "underline" : "none",
+            }} // 적용된 글자색 및 크기
           />
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -215,7 +219,7 @@ const PostScreen = () => {
             onCancel={() => setDatePickerVisibility(false)}
           />
           <ElementContainer>
-            <PhotoButton onPress={pickImages}>
+          <PhotoButton onPress={pickImages}>
               <Feather name="camera" size={24} color={colors.icon} />
             </PhotoButton>
             <TextButton onPress={toggleTextOptions}>
@@ -349,7 +353,7 @@ const PostScreen = () => {
                       key={sizeName}
                       onPress={() => applySize(sizeOptions[sizeName])}
                     >
-                      <Text style={{ fontSize: "14px" }}>{sizeName}</Text>
+                      <Text style={{ fontSize: 14 }}>{sizeName}</Text>
                     </OptionButton>
                   ))}
                 </BorderBox>
@@ -525,4 +529,4 @@ const OptionButton = styled.TouchableOpacity`
   padding: 2px 8px;
 `;
 
-export default PostScreen;
+export default MVPScreen;
