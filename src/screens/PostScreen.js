@@ -3,20 +3,12 @@ import styled from "styled-components/native";
 import { colors, fonts } from "../global";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
-<<<<<<< HEAD
-import BlogScreen from "./BlogScreen"; // BlogScreen을 별도 파일로 분리
-import MvpScreen from "./MvpScreen"; // MvpScreen을 별도 파일로 분리
-import { TouchableWithoutFeedback, Keyboard, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-=======
 import BlogScreen from "./BlogScreen";
 import MvpScreen from "./MvpScreen";
 import { TouchableWithoutFeedback, Keyboard, ScrollView, Platform } from "react-native";
->>>>>>> main
 
 const PostScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
-  const navigation = useNavigation();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -58,7 +50,7 @@ const PostScreen = () => {
               />
             ) : null}
           </DropdownContainer>
-          <PostButton onPress={() => navigation.navigate("CheckPost")}>
+          <PostButton>
             <ButtonText>등록하기</ButtonText>
           </PostButton>
         </Bar>
