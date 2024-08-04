@@ -3,12 +3,12 @@ import styled from "styled-components/native";
 import { colors, fonts } from "../global";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
-import BlogScreen from "./BlogScreen"; // BlogScreen을 별도 파일로 분리
-import MvpScreen from "./MvpScreen"; // MvpScreen을 별도 파일로 분리
+import BlogScreen from "./ModifyBlog"; // BlogScreen을 별도 파일로 분리
+import MvpScreen from "./ModifyMvp"; // MvpScreen을 별도 파일로 분리
 import { TouchableWithoutFeedback, Keyboard, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const PostScreen = () => {
+const ModifyScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
   const navigation = useNavigation();
 
@@ -52,7 +52,7 @@ const PostScreen = () => {
             </DropdownTouchable>
           </DropdownContainer>
           <PostButton onPress={() => navigation.navigate("CheckPost")}>
-            <ButtonText>등록하기</ButtonText>
+            <ButtonText>수정하기</ButtonText>
           </PostButton>
         </Bar>
 
@@ -102,4 +102,4 @@ const ButtonText = styled.Text`
   color: white;
 `;
 
-export default PostScreen;
+export default ModifyScreen;
