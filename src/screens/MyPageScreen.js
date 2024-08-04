@@ -32,7 +32,7 @@ const MyPageScreen = () => {
   };
 
   // Example red dates
-  const redDates = ['2024-08-01', '2024-08-15', '2024-08-20'];
+  const redDates = ['2024-07-01', '2024-07-15', '2024-07-20'];
   const today = new Date().toISOString().split('T')[0];
 
   const markedDates = redDates.reduce((acc, date) => {
