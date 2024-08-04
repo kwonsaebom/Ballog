@@ -19,11 +19,11 @@ export default function ComuWriteScreen() {
     title: '',
     detail: '',
     date: new Date().toLocaleDateString(),
-    time: new Date().toLocaleTimeString(),
+    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
     author_name: '홍길동', // 임시로 익명으로 설정
     likes: 0,
     comments: 0,
-    images: [], // 이미지 기능 추가 시 구현
+    images: [],
     category: category,
   });
 
