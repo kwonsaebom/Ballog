@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 const LogoutScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,10 +31,12 @@ const LogoutScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.bar}>
-        <TouchableOpacity onPress={navigateBack}>
-          <Image style={styles.ReturnImage} source={require('../assets/LeftVector.png')} />
+        <TouchableOpacity style={styles.backButton} onPress={navigateBack}>
+          <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>내 계정</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>내 계정</Text>
+        </View>
       </View>
       <Image style={styles.image} source={require('../assets/Profile.png')} />
       <TouchableOpacity style={styles.uploadButton}>
@@ -86,11 +89,20 @@ const styles = StyleSheet.create({
     width: 6,
     height: 12,
   },
+  backButton: {
+    width: 30,
+    height: 30,
+    position: 'absolute',
+    marginHorizontal: 13,
+  },
+  titleContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 14,
     fontWeight: 'bold',
-    position: 'absolute',
-    left: '50%',
   },
   image: {
     width: 113,
@@ -143,13 +155,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
-    width: '80%',
+    width: '90%',
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 19,
+    fontWeight: '800',
+    marginBottom: 15,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -157,12 +169,17 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     padding: 10,
-    borderRadius: 5,
+    width: 154,
+    height: 42,
+    borderRadius: 44,
     margin: 5,
     backgroundColor: '#C51E3A',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalButtonText: {
     fontSize: 16,
+    fontWeight: '600',
     color: '#fff',
   },
   confirmButton: {
