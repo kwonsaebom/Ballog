@@ -1,25 +1,31 @@
 //ComuPostedScreen.js
-import React, {useState, useContext, useMemo} from 'react'
-import styled from 'styled-components/native'
+import React, {useState, useContext, useMemo, useRef} from 'react';
+import { Keyboard } from 'react-native';
+import styled from 'styled-components/native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { PostsContext } from '../Context API/PostsContext';
 import { CommentsContext } from '../Context API/CommentsContext';
 import { getRandomPastelColor } from '../utils/colors';
+import ReplyIconImg from '../assets/icons/replyicon.png';
 import { Ionicons, AntDesign, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 export default function ComuPostedScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const {updateLikes, getPostById} = useContext(PostsContext);
-  const {comments, addComment} = useContext(CommentsContext);
+  const {updateLikes, getPostById, deletePost} = useContext(PostsContext);
+  const {comments, addComment, addReply, getTotalCommentCount} = useContext(CommentsContext);
   const {postId, category} = route.params || {};
   const [selectedCategory, setSelectedCategory] = useState(category);
   const [userName, setUserName] = useState('익명');
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
 
   const post = getPostById(postId);
 
-  const [commentCount, setCommentCount] = useState(0);
   const [inputValue, setInputValue] = useState('');
+  const [replyInputValue, setReplyInputValue] = useState('');
+  const [replyToCommentId, setReplyToCommentId] = useState(null);
+
   const postComments = comments[postId] || [];
 
   const userCircleColors = useMemo(() => {
@@ -29,6 +35,8 @@ export default function ComuPostedScreen() {
     });
     return colors;
   }, [postComments]);
+
+  const inputRef = useRef(null);
 
   const handleBackPress = () => {
     navigation.navigate("MainTabs", {
@@ -46,19 +54,69 @@ export default function ComuPostedScreen() {
       detail: inputValue,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
+      replies: [],
     };
 
     addComment(postId, newComment);
     setInputValue('');
-    setCommentCount(commentCount + 1);
   };
 
-  if (!post) {
-    return null; //post가 없으면 아무것도 렌더링하지 않음
+  const handleReplySubmit = () => {
+    if (replyInputValue.trim() === '' || replyToCommentId === null) return;
+
+    const newReply = {
+      id: Date.now().toString(),
+      username: userName,
+      detail: replyInputValue,
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    addReply(postId, replyToCommentId, newReply);
+    setReplyInputValue('');
+    setReplyToCommentId(null); 
+  };
+
+  const handleEditPress = () => {
+    navigation.navigate('ComuWriteScreen', {
+      postId: post.id,
+      category: post.category,
+    });
+  };
+
+  const handleDeletePress = () => {
+    deletePost(postId);
+    navigation.navigate("MainTabs", {
+      screen: '커뮤니티',
+      params: {category}
+    });
+  };
+
+  const openReplyModal = (commentId) => {
+    setReplyToCommentId(commentId);
+    setModalType('reply');
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalType('');
+  };
+
+  const confirmReply = () => {
+    closeModal();
+    if (inputRef.current) {
+      inputRef.current.focus(); //작성 버튼 클릭 시 포커스
+      Keyboard.addListener('keyboardDidShow', () => {}); //키보드 활성화
+    }
+    handleReplySubmit();
   }
+
+  const totalCommentCount = getTotalCommentCount(postId);
 
   return (
     <Wrapper>
+
       <ComuPostedHeader>
         <BackButton onPress={handleBackPress}>
           <Ionicons name="chevron-back" size={24} color="black" />
@@ -67,6 +125,7 @@ export default function ComuPostedScreen() {
           <ScreenTitle>{selectedCategory === 'league' ? ('리그 커뮤니티') : ('마이팀 커뮤니티')}</ScreenTitle>
         </ScreenTitleWrapper>
       </ComuPostedHeader>
+
       <ScrollContainer>
         <ComuPostedBox>
           <WriterInfoBox>
@@ -109,67 +168,121 @@ export default function ComuPostedScreen() {
               <ChatIcon>
                     <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
               </ChatIcon>
-              <ChatCount>{postComments.length}</ChatCount>
+              <ChatCount>{totalCommentCount}</ChatCount>
             </IconWrapper>
             <ButtonWrapper>
-              <EditDeleteButton>
+              <EditDeleteButton onPress={handleEditPress}>
                 <ButtonText>수정</ButtonText>
                 <MaterialCommunityIcons name="pencil-outline" size={13} color="black" />
               </EditDeleteButton>
-              <EditDeleteButton>
+              <EditDeleteButton onPress={handleDeletePress}>
                 <ButtonText>삭제</ButtonText>
                 <Feather name="trash-2" size={13} color="black" />
               </EditDeleteButton>
             </ButtonWrapper>
           </PostFooter>
         </ComuPostedBox>
-        <CommetsBoxWrapper>
+          <LayoutBox>
           {postComments.map((comment) => (
-          <CommentsBox key={comment.id}>
-            <UserInfo>
-              <UserNameWrapper>
-                <UserCircle color={userCircleColors[comment.id]}>
-                  <UserFirstName>{userName.slice(1)}</UserFirstName>
-                </UserCircle>
-                <UserName>{userName}</UserName>
-              </UserNameWrapper>
-            </UserInfo>
-            <DetailTimeWrapper>
-              <CommentDetail>{comment.detail}</CommentDetail>
-              <DetailFooter>
-                <DateTime>{`${comment.date} | ${comment.time}`}</DateTime>
-                <ReplyButton>
-                  <ReplyButtonText>답글</ReplyButtonText>
-                </ReplyButton>
-              </DetailFooter>
-            </DetailTimeWrapper>
-          </CommentsBox>
-          ))}
-        </CommetsBoxWrapper>
+          <CommetsBoxWrapper key={comment.id}>
+            <CommentsBox >
+              <UserInfo>
+                <UserNameWrapper>
+                  <UserCircle color={userCircleColors[comment.id]}>
+                    <UserFirstName>{userName.slice(1)}</UserFirstName>
+                  </UserCircle>
+                  <UserName>{userName}</UserName>
+                </UserNameWrapper>
+              </UserInfo>
+              <DetailTimeWrapper>
+                <CommentDetail>{comment.detail}</CommentDetail>
+                <DetailFooter>
+                  <DateTime>{`${comment.date} | ${comment.time}`}</DateTime>
+                  <ReplyButton onPress={() => {openReplyModal(comment.id)}}>
+                    <ReplyButtonText>답글</ReplyButtonText>
+                  </ReplyButton>
+                </DetailFooter>
+              </DetailTimeWrapper>
+            </CommentsBox>
+
+            {comment.replies.map(reply => (
+                <ReplyBox key={reply.id}>
+                  <ReplyIcon source={ReplyIconImg} />
+                  <UserInfo>
+                    <UserNameWrapper>
+                      <UserCircle color={getRandomPastelColor()}>
+                        <UserFirstName>{reply.username.slice(1)}</UserFirstName>
+                      </UserCircle>
+                      <UserName>{reply.username}</UserName>
+                      <MyselfMark>
+                        <MyselfMarkText>나</MyselfMarkText>
+                      </MyselfMark>
+                    </UserNameWrapper>
+                  </UserInfo>
+                  <DetailTimeWrapper>
+                    <CommentDetail>{reply.detail}</CommentDetail>
+                    <DetailFooter>
+                      <DateTime>{`${reply.date} | ${reply.time}`}</DateTime>
+                    </DetailFooter>
+                  </DetailTimeWrapper>
+                </ReplyBox>
+            ))}
+          </CommetsBoxWrapper>
+        ))}
+        </LayoutBox>
       </ScrollContainer>
+
       <CommentsFooter>
         <InputBoxWrapper>
           <UserCircle2 color={getRandomPastelColor()}>
             <UserFirstName>길동</UserFirstName>
           </UserCircle2>
-          <CommentInputBox 
-            placeholder='댓글을 입력해주세요' 
-            placeholderTextColor={'#B5B5B5'} 
-            multiline
-            value={inputValue}
-            onChangeText={setInputValue}
-          />
-          <UploadButton onPress={handleCommentSubmit}>
+          {replyToCommentId ? (
+            <ReplyInputBox 
+              ref={inputRef}
+              placeholder='답글을 입력해주세요' 
+              placeholderTextColor={'#B5B5B5'} 
+              multiline
+              value={replyInputValue}
+              onChangeText={setReplyInputValue}
+            />
+          ) : (
+            <CommentInputBox 
+              placeholder='댓글을 입력해주세요' 
+              placeholderTextColor={'#B5B5B5'} 
+              multiline
+              value={inputValue}
+              onChangeText={setInputValue}
+            />
+          )}
+          <UploadButton onPress={replyToCommentId ? handleReplySubmit : handleCommentSubmit}>
             <Feather name="send" size={24} color="#C51E3A" />
           </UploadButton>
         </InputBoxWrapper>
       </CommentsFooter>
+
+      {showModal && (
+        <ReplyModalWrapper>
+          <ReplyModal>
+            <ReplyOptionText>답글을 작성하시겠습니까?</ReplyOptionText>
+            <OptionButtonWrapper>
+              <OptionButton onPress={closeModal}>
+                <OptionButtonText>취소</OptionButtonText>
+              </OptionButton>
+              <OptionButton onPress={confirmReply}>
+                <OptionButtonText>작성</OptionButtonText>
+              </OptionButton>
+            </OptionButtonWrapper>
+          </ReplyModal>
+        </ReplyModalWrapper>
+      )}
     </Wrapper>
   )
 }
 
 const Wrapper = styled.View`
-    flex: 1;
+  flex: 1;
+  background-color: #f8f8f8;
 `;
 
 const ComuPostedHeader = styled.View`
@@ -187,7 +300,9 @@ const BackButton = styled.TouchableOpacity`
   left: 13px;
 `;
 
-const ScrollContainer = styled.ScrollView``;
+const ScrollContainer = styled.ScrollView`
+  margin-bottom: 80px;
+`;
 
 const ScreenTitleWrapper = styled.View`
   justify-content: center;
@@ -347,8 +462,7 @@ const ButtonText = styled.Text`
   margin-right: 2px;
 `;
 
-const CommetsBoxWrapper = styled.ScrollView`
-  margin-bottom: 80px;
+const CommetsBoxWrapper = styled.View`
 `;
 
 const CommentsBox = styled.View`
@@ -426,6 +540,41 @@ const ReplyButtonText = styled.Text`
   color: #AAAAAA;
 `;
 
+const ReplyBox = styled.View`
+  padding-top: 13px;
+  padding-bottom: 13px;
+  padding-left: 40px;
+  padding-right: 25px;
+  border-bottom-width: 0.5px;
+  border-bottom-color: #DBDBDB;
+  background-color: #f2f2f2;
+`;
+
+const ReplyIcon = styled.Image`
+  position: absolute;
+  left: 20px;
+  top: 10px;
+  width: 12.73px;
+  height: 14.09px;
+`;
+
+const MyselfMark = styled.View`
+  align-items: center;
+  justify-content: center;
+  border-width: 0.5px;
+  border-color: #C51E3A;
+  border-radius: 20px;
+  width: 15.95px;
+  height: 10.61px;
+  margin-left: 5px;
+`;
+
+const MyselfMarkText = styled.Text`
+  font-size: 8px;
+  color: #C51E3A;
+  font-family: 'Inter-Regular';
+`;
+
 const CommentsFooter = styled.View`
   position: absolute;
   height: 80px;
@@ -469,5 +618,60 @@ const CommentInputBox = styled.TextInput`
   padding-right: 10px;
 `;
 
+const LayoutBox = styled.View``;
+
+const ReplyInputBox = styled.TextInput`
+  font-family: 'Inter-Regular';
+  width: 84%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+`;
+
 const UploadButton = styled.TouchableOpacity`
+`;
+
+const ReplyModalWrapper = styled.View`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+`;
+
+const ReplyModal = styled.View`
+  width: 210px;
+  height: 90px;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 15px;
+`;
+
+const ReplyOptionText = styled.Text`
+  font-family: 'Inter-Regular';
+  font-size: 16px;
+`;
+
+const OptionButtonWrapper = styled.View`
+  flex-direction: row;
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  gap: 10px;
+`;
+
+const OptionButton = styled.TouchableOpacity`
+  background-color: #D9D9D9;
+  width: 38px;
+  height: 19px;
+  border-radius: 18px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const OptionButtonText = styled. Text`
+  font-family: 'Inter-Regular';
+  font-size: 13px;
 `;

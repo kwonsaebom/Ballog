@@ -1,7 +1,8 @@
 import React from 'react';
 import { colors } from '../global';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 const ProfileImage = () => {
   
@@ -12,11 +13,15 @@ const ProfileImage = () => {
         navigation.navigate('TeamSelect'); // Navigate to LoginPage
     };
 
+    const navigateBack = () => {
+      navigation.goBack();
+    };
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.contentContainer}>
-        <TouchableOpacity style={styles.returnButton} onPress={onPressHandler}>
-            <Image style={styles.returnImage} source={require('../assets/Return.png')} />
+        <TouchableOpacity style={styles.returnButton} onPress={navigateBack}>
+          <Ionicons name="chevron-back" size={30} color="black" />
         </TouchableOpacity>
         <View style={styles.TeamText}>
           <Text style={styles.SelectText}><Text style={styles.MyTeam}>Ballog </Text>에서 사용할 {'\n'}프로필 사진을 등록하세요</Text>
@@ -49,10 +54,6 @@ const styles = StyleSheet.create({
     height: 700,
     paddingHorizontal: 20,
     paddingVertical: 10,
-  },
-  returnImage:{
-    width: 38,  
-    height: 38,
   },
   TeamText:{
     alignItems: 'flex-start',

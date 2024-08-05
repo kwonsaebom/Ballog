@@ -15,7 +15,7 @@ import {
 } from "@expo/vector-icons";
 import { colors, fonts } from "../global";
 
-const CheckPost = () => {
+const CheckMVP = () => {
   const [showButtons, setShowButtons] = useState(false);
   const navigation = useNavigation();
 
@@ -80,51 +80,52 @@ const CheckPost = () => {
 
           <TitleWrapper>
             <UserTypeWrapper>
-              <UserType>BLOG</UserType>
+              <UserType>오늘의 MVP</UserType>
             </UserTypeWrapper>
-            <Title>첫 직관 후기</Title>
-            <UserImage source={require("../assets/Profile.png")} />
             <DateTime>2024.06.24</DateTime>
+            <MVPImage source={require("../assets/MVP.png")} />
           </TitleWrapper>
           <ScoreWrapper>
             <ScoreDate>
-              <DateText>6/24 경기</DateText>
+              <DateText>오늘의 기록</DateText>
             </ScoreDate>
-            <Score>
-              <ScoreImage source={require("../assets/Teams/Doosan.png")} />
-              <ScoreNum>5 : 3</ScoreNum>
-              <ScoreImage source={require("../assets/Teams/LG.png")} />
-            </Score>
+            <ResultText>4타수 2안타 1홈런 3타점</ResultText>
           </ScoreWrapper>
-          <ContentWrapper>
-            <ContentText>
-              안녕하세요. 오늘은 야구 경기 직관 후기를 적어보도록 하겠습니다.
-              오늘의 간식은 치킨이었습니다. 직관하며 먹으니 더욱 꿀맛이었습니다.
-            </ContentText>
-            <ContentImage source={require("../assets/imgs/sampleImg.png")} />
-          </ContentWrapper>
+          <PostFooter>
+            <IconWrapper>
+              <LikeIcon>
+                <AntDesign name="hearto" size={21} color="#E05936" />
+              </LikeIcon>
+              <LikeCount>7</LikeCount>
+              <ChatIcon onPress={() => navigation.navigate("Comment")}>
+                <MaterialCommunityIcons
+                  name="message-reply-outline"
+                  size={21}
+                  color="#8892F7"
+                />
+              </ChatIcon>
+              <ChatCount>7</ChatCount>
+            </IconWrapper>
+            <BookmarkButton>
+              <BookmarkImage source={require("../assets/Bookmark.png")} />
+            </BookmarkButton>
+          </PostFooter>
         </Container>
       </ScrollView>
 
-      <PostFooter>
-        <IconWrapper>
-          <LikeIcon>
-            <AntDesign name="hearto" size={21} color="#E05936" />
-          </LikeIcon>
-          <LikeCount>7</LikeCount>
-          <ChatIcon onPress={() => navigation.navigate("Comment")}>
-            <MaterialCommunityIcons
-              name="message-reply-outline"
-              size={21}
-              color="#8892F7"
-            />
-          </ChatIcon>
-          <ChatCount>7</ChatCount>
-        </IconWrapper>
-        <BookmarkButton>
-          <BookmarkImage source={require("../assets/Bookmark.png")} />
-        </BookmarkButton>
-      </PostFooter>
+      <CommentsFooter>
+        <InputBoxWrapper>
+          <UserImage source={require("../assets/Profile.png")} />
+          <CommentInputBox
+            placeholder="댓글을 입력해주세요"
+            placeholderTextColor={"#B5B5B5"}
+            multiline
+          />
+          <UploadButton>
+            <Feather name="send" size={24} color="#C51E3A" />
+          </UploadButton>
+        </InputBoxWrapper>
+      </CommentsFooter>
     </Wrapper>
   );
 };
@@ -216,51 +217,43 @@ const TitleWrapper = styled.View`
 
 const UserTypeWrapper = styled.View`
   align-self: center;
+  border: 1px solid ${colors.primary};
   margin: 20px 0;
   border-radius: 23px;
 `;
 
 const UserType = styled.Text`
   color: ${colors.primary};
-  border: 1px solid ${colors.primary};
-  border-radius: 23px;
   padding: 4px 12px;
   justify-content: center;
   font-size: ${fonts.sizes.small};
   font-weight: ${fonts.weights.bold};
 `;
 
-const Title = styled.Text`
-  font-size: ${fonts.sizes.big};
-  font-weight: ${fonts.weights.bold};
-  margin-bottom: 15px;
-`;
-
-const UserImage = styled.Image`
-  width: 25px;
-  height: 25px;
-  margin-bottom: 10px;
-`;
 
 const DateTime = styled.Text`
   color: #aaaaaa;
   font-size: 11px;
-  margin-bottom: 35px;
+  margin-bottom: 20px;
+`;
+
+const MVPImage = styled.Image`
+  margin-bottom: 20px;
 `;
 
 const ScoreWrapper = styled.View`
   align-items: center;
-  height: 132px;
+  height: 100px;
   width: 100%;
   background-color: rgba(217, 217, 217, 0.21);
-  padding: 12px;
+  padding: 20px;
 `;
 
 const ScoreDate = styled.View`
   width: 96px;
   height: 23px;
   color: black;
-  border: 1px solid black;
+  border: 1.5px solid black;
   border-radius: 20px;
   justify-content: center;
   margin-bottom: 10px;
@@ -268,48 +261,21 @@ const ScoreDate = styled.View`
 
 const DateText = styled.Text`
   text-align: center;
-  font-size: 13px;
+  font-size: 11px;
   color: black;
+  font-weight: 900;
 `;
 
-const Score = styled.View`
-  width: 250px;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ScoreImage = styled.Image`
-  width: 59px;
-  height: 71px;
-`;
-
-const ScoreNum = styled.Text`
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: 8px;
-`;
-
-const ContentWrapper = styled.View`
-  padding: 20px;
-  align-items: center;
-`;
-
-const ContentText = styled.Text``;
-
-const ContentImage = styled.Image`
-  width: 300px;
-  height: 300px;
-  margin: 10px;
+const ResultText = styled.Text`
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
 `;
 
 const PostFooter = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
   padding: 5px 10px;
-
-  border: 1px solid #dbdbdb;
 `;
 
 const IconWrapper = styled.View`
@@ -339,4 +305,47 @@ const BookmarkImage = styled.Image`
   width: 30px;
   height: 30px;
 `;
-export default CheckPost;
+
+const CommentsFooter = styled.View`
+  position: absolute;
+  height: 80px;
+  bottom: 0px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding-left: 13px;
+  padding-right: 13px;
+  background-color: #fff;
+`;
+
+const InputBoxWrapper = styled.View`
+  flex-direction: row;
+  padding-right: 15px;
+  padding-left: 15px;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 36px;
+  border-color: #c51e3a;
+  border-width: 1px;
+  width: 100%;
+  height: 48px;
+`;
+
+const UserImage = styled.Image`
+  width: 28.52px;
+  height: 28.52px;
+  border-radius: 15px;
+  justify-content: center;
+  align-items: center;
+  margin-right: 5px;
+`;
+
+const CommentInputBox = styled.TextInput`
+  font-family: "Inter-Regular";
+  width: 84%;
+  padding-top: 8px 10px;
+`;
+
+const UploadButton = styled.TouchableOpacity``;
+
+export default CheckMVP;

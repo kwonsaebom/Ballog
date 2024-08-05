@@ -12,11 +12,15 @@ const ModifyScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
   const navigation = useNavigation();
 
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
         <Bar>
-          <CloseButton>
+          <CloseButton onPress={handleBackPress}>
             <AntDesign name="close" size={24} color="#33363f" />
           </CloseButton>
           <DropdownContainer>
@@ -51,7 +55,7 @@ const ModifyScreen = () => {
               />
             </DropdownTouchable>
           </DropdownContainer>
-          <PostButton onPress={() => navigation.navigate("CheckPost")}>
+          <PostButton onPress={handleBackPress}>
             <ButtonText>수정하기</ButtonText>
           </PostButton>
         </Bar>

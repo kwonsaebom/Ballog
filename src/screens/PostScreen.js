@@ -15,7 +15,6 @@ import { useNavigation } from "@react-navigation/native";
 
 const PostScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
-  const navigation = useNavigation();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -57,7 +56,7 @@ const PostScreen = () => {
               />
             ) : null}
           </DropdownContainer>
-          <PostButton onPress={() => navigation.navigate("CheckPost")}>
+          <PostButton>
             <ButtonText>등록하기</ButtonText>
           </PostButton>
         </Bar>
