@@ -1,63 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components/native";
 import { colors, fonts } from "../global";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
-import BlogScreen from "./BlogScreen"; // BlogScreen을 별도 파일로 분리
-import MvpScreen from "./MvpScreen"; // MvpScreen을 별도 파일로 분리
-import {
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
-  Platform,
-} from "react-native";
+import BlogScreen from "./ModifyBlog"; // BlogScreen을 별도 파일로 분리
+import MvpScreen from "./ModifyMvp"; // MvpScreen을 별도 파일로 분리
+import { TouchableWithoutFeedback, Keyboard, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const PostScreen = () => {
+const ModifyScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
+  const navigation = useNavigation();
+
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
         <Bar>
-          <CloseButton>
+          <CloseButton onPress={handleBackPress}>
             <AntDesign name="close" size={24} color="#33363f" />
           </CloseButton>
           <DropdownContainer>
-            <RNPickerSelect
-              value={selectedValue}
-              items={[
-                { label: "BLOG", value: "blog" },
-                { label: "MVP", value: "mvp" },
-              ]}
-              onValueChange={(value) => setSelectedValue(value)}
-              style={{
-                inputIOS: {
-                  fontSize: fonts.sizes.medium,
-                  fontWeight: fonts.weights.regular,
-                  color: colors.text,
-                  padding: 10,
-                },
-                inputAndroid: {
-                  fontSize: fonts.sizes.medium,
-                  fontWeight: fonts.weights.regular,
-                  color: colors.text,
-                  padding: 10,
-                  width: 120,
-                },
-              }}
-            />
-            {Platform.OS === "ios" ? (
+            <DropdownTouchable>
+              <RNPickerSelect
+                value={selectedValue}
+                items={[
+                  { label: "BLOG", value: "blog" },
+                  { label: "MVP", value: "mvp" },
+                ]}
+                onValueChange={(value) => setSelectedValue(value)}
+                style={{
+                  inputIOS: {
+                    fontSize: fonts.sizes.medium,
+                    fontWeight: fonts.weights.regular,
+                    color: colors.text,
+                    padding: 10,
+                  },
+                  inputAndroid: {
+                    fontSize: fonts.sizes.medium,
+                    fontWeight: fonts.weights.regular,
+                    color: colors.text,
+                    padding: 10,
+                  },
+                }}
+              />
               <AntDesign
                 name="caretdown"
                 size={12}
                 color="black"
                 style={{ marginLeft: 5, marginTop: -3 }}
               />
-            ) : null}
+            </DropdownTouchable>
           </DropdownContainer>
-          <PostButton>
-            <ButtonText>등록하기</ButtonText>
+          <PostButton onPress={handleBackPress}>
+            <ButtonText>수정하기</ButtonText>
           </PostButton>
         </Bar>
 
@@ -83,7 +82,9 @@ const Bar = styled.View`
 
 const CloseButton = styled.TouchableOpacity``;
 
-const DropdownContainer = styled.View`
+const DropdownContainer = styled.View``;
+
+const DropdownTouchable = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   margin-left: 40px;
@@ -105,4 +106,4 @@ const ButtonText = styled.Text`
   color: white;
 `;
 
-export default PostScreen;
+export default ModifyScreen;
