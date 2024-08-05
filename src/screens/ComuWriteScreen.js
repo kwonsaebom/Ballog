@@ -1,19 +1,18 @@
 //ComuWriteScreen.js
 import React, {useState, useContext, useEffect} from 'react'
 import styled from 'styled-components/native'
-import { Feather, AntDesign } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { Feather } from '@expo/vector-icons';
+import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { PostsContext } from '../Context API/PostsContext';
 
 export default function ComuWriteScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const {addPost, updatePost, getPostById} = useContext(PostsContext);
+  const {addPost} = useContext(PostsContext);
+  const isFocused = useIsFocused(); //화면이 포커스될 때 상태를 확인
 
   const category = route.params?.category || 'league';
-  const postId = route.params?.postId;
-  const existingPost = postId ? getPostById(postId) : null;
 
   const [posts, setPosts] = useState({
     id: Date.now().toString(), // 임시로 랜덤 ID 생성
@@ -31,10 +30,18 @@ export default function ComuWriteScreen() {
   const { title, detail, images } = posts;
 
   useEffect(() => {
-    if (postId && existingPost) {
-      setPosts(existingPost);
+    if (isFocused) {
+      // 화면이 포커스될 때 상태 초기화
+      setPosts({
+        ...posts,
+        id: Math.random().toString(),
+        title: '',
+        detail: '',
+        images: [],
+        category: category,
+      });
     }
-  }, [postId, existingPost]);
+  }, [isFocused, category]);
 
   const onChange = (name, value) => {
     setPosts({
@@ -48,13 +55,7 @@ export default function ComuWriteScreen() {
         alert('내용을 입력해주세요.');
         return;
     }
-
-    if (existingPost) {
-        updatePost(posts);
-    } else {
-        addPost(posts); // 새로운 게시글을 Context에 추가
-    }
-    
+    addPost(posts); // 새로운 게시글을 Context에 추가
     navigation.navigate('ComuPostedScreen', {
         postId: posts.id, 
         category: posts.category,
@@ -73,13 +74,6 @@ export default function ComuWriteScreen() {
             images: [...posts.images, ...result.assets.map(asset => asset.uri)],
         });
     }
-  };
-
-  const removeImage = (uriToRemove) => {
-    setPosts({
-      ...posts,
-      images: posts.images.filter(uri => uri !== uriToRemove),
-    });
   };
 
   return (
@@ -129,15 +123,11 @@ export default function ComuWriteScreen() {
              showsHorizontalScrollIndicator={false}
             >
                 {images.map((uri, index) => (
-                    <ImgWrapper key={index} >
-                        <ImageThumbnail 
-                        source={{uri}}
-                        isFirst={index === 0}
-                        />
-                        <RemoveImageButton onPress={() => removeImage(uri)}>
-                            <AntDesign name="delete" size={15} color={"#222222"} />
-                        </RemoveImageButton>
-                    </ImgWrapper>
+                    <ImageThumbnail 
+                    key={index} 
+                    source={{uri}}
+                    isFirst={index === 0}
+                    />
                 ))}
             </ImagesContainer>
         </ComuWriteFooter>
@@ -276,8 +266,6 @@ const ImagesContainer = styled.ScrollView`
     width: 100%;
 `;
 
-const ImgWrapper = styled.View``;
-
 const ImageThumbnail = styled.Image`
     flex-direction: row;
     resize-mode: cover;
@@ -288,13 +276,4 @@ const ImageThumbnail = styled.Image`
     border-width: 1px;
     ${({ isFirst }) => isFirst && 'margin-left: 13px;'}
     margin-right: 13px;
-`;
-
-const RemoveImageButton = styled.TouchableOpacity`
-  position: absolute;
-  top: 3px;
-  right: 16px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50px;
-  padding: 5px;
 `;

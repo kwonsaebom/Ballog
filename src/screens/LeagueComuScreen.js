@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function LeagueComuScreen({posts}) {
   const {updateLikes, getPostById} = useContext(PostsContext);
-  const {getTotalCommentCount} = useContext(CommentsContext);
+  const {comments} = useContext(CommentsContext);
   const navigation = useNavigation();
 
   if (!posts || posts.length === 0) {
@@ -24,7 +24,7 @@ export default function LeagueComuScreen({posts}) {
     <ScrollWrapper showsVerticalScrollIndicator={false}>
       <ComuBoxWrapper>
         {posts.map((post, index) => {
-          const totalCommentCount = getTotalCommentCount(post.id);
+          const postComments = comments ? comments[post.id] || [] : [];
             return(
               <ComuBox 
                 key={`${post.id}-${index}`} 
@@ -46,7 +46,7 @@ export default function LeagueComuScreen({posts}) {
                       <LikeIcon onPress={() => updateLikes(post.id)}><AntDesign name="hearto" size={10} color="#E05936" /></LikeIcon>
                       <LikeCount>{post.likes}</LikeCount>
                       <ChatIcon><MaterialCommunityIcons name="message-reply-outline" size={10} color="#8892F7" /></ChatIcon>
-                      <ChatCount>{totalCommentCount}</ChatCount>
+                      <ChatCount>{postComments.length}</ChatCount>
                     </IconWrapper>
                     <DateTime>{`| ${post.date} ${post.time} | ${post.author_name}`}</DateTime>
                   </ComuFooter>

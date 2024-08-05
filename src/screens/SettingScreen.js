@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 
 const useCommonNavigation = () => {
     const navigation = useNavigation();
@@ -27,12 +26,10 @@ const SettingScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.bar}>
-                <TouchableOpacity style={styles.backButton} onPress={navigateBack}>
-                    <Ionicons name="chevron-back" size={24} color="black" />
+                <TouchableOpacity onPress={navigateBack}>
+                    <Image style={styles.ReturnImage} source={require('../assets/LeftVector.png')} />
                 </TouchableOpacity>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>설정</Text>
-                </View>
+                <Text style={styles.title}>설정</Text>
             </View>
             <TouchableOpacity style={styles.button} onPress={() => navigateTo('LogoutScreen')}>
                 <View style={styles.texts}>
@@ -69,18 +66,15 @@ const styles = StyleSheet.create({
         marginBottom: 7,
         width: '100%', 
     },
-    backButton: {
-        position: 'absolute',
-        marginHorizontal: 13,
-    },
-    titleContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+    ReturnImage: {
+        width: 6, 
+        height: 12,
     },
     title: {
-        fontSize: 14,
-        fontWeight: 'bold',
+        fontSize: 14, 
+        fontWeight: 'bold', 
+        position: 'absolute', 
+        left: '50%', 
     },
     button: {
         flexDirection: 'row',
