@@ -14,8 +14,7 @@ import ComuPostedScreen from "../screens/ComuPostedScreen";
 import LeagueComuScreen from "../screens/LeagueComuScreen";
 import MyTeamComuScreen from "../screens/MyTeamComuScreen";
 import NotificationScreen from "../screens/NotificationScreen";
-import CheckBlog from "../screens/CheckBlogScreen";
-import CheckMVP from "../screens/CheckMvpScreen";
+import CheckPost from "../screens/CheckPostScreen";
 import PostScreen from "../screens/PostScreen";
 import Comment from "../screens/CommentScreen";
 import Modify from "../screens/ModifyScreen";
@@ -64,8 +63,7 @@ const StackNavigator = () => {
           name="NotificationScreen"
           component={NotificationScreen}
         />
-        <Stack.Screen name="CheckBlog" component={CheckBlog} />
-        <Stack.Screen name="CheckMVP" component={CheckMVP} />
+        <Stack.Screen name="CheckPost" component={CheckPost} />
         <Stack.Screen name="PostScreen" component={PostScreen} />
         <Stack.Screen name="Comment" component={Comment} />
         <Stack.Screen name="Modify" component={Modify} />
