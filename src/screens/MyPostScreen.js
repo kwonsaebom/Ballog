@@ -1,23 +1,9 @@
 // MyPost.js
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Modal,
-  Pressable,
-  TouchableWithoutFeedback,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import {
-  Ionicons,
-  AntDesign,
-  MaterialCommunityIcons,
-  Feather,
-} from "@expo/vector-icons";
-import ModalComponent from "../components/Modal";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Pressable, TouchableWithoutFeedback } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons, AntDesign, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import ModalComponent from '../components/Modal';
 
 const MyPostScreen = () => {
   const [miniModalVisible1, setMiniModalVisible1] = useState(false);
@@ -55,60 +41,38 @@ const MyPostScreen = () => {
     <View style={styles.container}>
       <View style={styles.bar}>
         <TouchableOpacity style={styles.backButton} onPress={navigateBack}>
-          <Ionicons name="chevron-back" size={24} color="black" />
+            <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>내가 쓴 글</Text>
         </View>
       </View>
       <View style={styles.BlogContainer}>
-        <TouchableOpacity
-          style={styles.BlogButton}
-          onPress={() => navigation.navigate("CheckPost")}
-        >
+        <TouchableOpacity style={styles.BlogButton}>
           <View style={styles.Tab}>
             <Text style={styles.TabText}>BLOG</Text>
             <Text style={styles.TabText}>2024.06.25</Text>
           </View>
-          <Image
-            style={styles.BlogImage}
-            source={require("../assets/basic.png")}
-          />
+          <Image style={styles.BlogImage} source={require('../assets/basic.png')} />
           <View style={styles.TextContainer}>
             <View style={styles.LeftContainer}>
-              <Image
-                style={styles.ProfileImage}
-                source={require("../assets/Profile.png")}
-              />
+              <Image style={styles.ProfileImage} source={require('../assets/Profile.png')} />
               <View style={styles.Texts}>
                 <Text style={styles.mainText}>오늘 경기 폼 미쳤다!!!</Text>
-                <Text style={styles.subText}>
-                  조회수 : 8회 | 18 : 06 업로드
-                </Text>
+                <Text style={styles.subText}>조회수 : 8회 | 18 : 06 업로드</Text>
               </View>
             </View>
-
+            
             <View style={styles.Set_IconContainer}>
-              <TouchableOpacity
-                style={styles.settingButton}
-                onPress={onPressHandler1}
-              >
-                <Ionicons
-                  name="ellipsis-horizontal-sharp"
-                  size={18}
-                  color="black"
-                />
+              <TouchableOpacity style={styles.settingButton} onPress={onPressHandler1}>
+                <Ionicons name="ellipsis-horizontal-sharp" size={18} color="black" />
               </TouchableOpacity>
               <View style={styles.IconWrapper}>
                 <TouchableOpacity onPress={navigateBack}>
                   <AntDesign name="hearto" size={12} color="#E05936" />
                 </TouchableOpacity>
                 <Text style={styles.LikeCount}>7</Text>
-                <MaterialCommunityIcons
-                  name="message-reply-outline"
-                  size={12}
-                  color="#8892F7"
-                />
+                <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
                 <Text style={styles.ChatCount}>10</Text>
               </View>
             </View>
@@ -122,29 +86,16 @@ const MyPostScreen = () => {
             <Text style={styles.TabText}>2024.06.25</Text>
           </View>
           <View style={styles.MvpBody}>
-            <Image
-              style={styles.MvpImage}
-              source={require("../assets/basic.png")}
-            />
+            <Image style={styles.MvpImage} source={require('../assets/basic.png')} />
             <View style={styles.MvpBodyRight}>
               <View style={styles.MvpBody_1}>
                 <View style={styles.TeamName}>
-                  <Image
-                    style={styles.TeamLogoImage}
-                    source={require("../assets/Teams/Doosan.png")}
-                  />
+                  <Image style={styles.TeamLogoImage} source={require('../assets/Teams/Doosan.png')} />
                   <Text style={styles.MvpName}>박건우</Text>
                 </View>
                 <View style={styles.settingButtonCon}>
-                  <TouchableOpacity
-                    style={styles.settingButton}
-                    onPress={onPressHandler2}
-                  >
-                    <Ionicons
-                      name="ellipsis-horizontal-sharp"
-                      size={18}
-                      color="black"
-                    />
+                  <TouchableOpacity style={styles.settingButton} onPress={onPressHandler2}>
+                    <Ionicons name="ellipsis-horizontal-sharp" size={18} color="black" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -153,22 +104,13 @@ const MyPostScreen = () => {
                 <Text>4타수 2안타 1홈런 3타점</Text>
               </View>
               <View style={styles.MvpBody_3}>
-                <Text style={styles.subText}>
-                  조회수 : 8회 | 18 : 06 업로드
-                </Text>
+                <Text style={styles.subText}>조회수 : 8회 | 18 : 06 업로드</Text>
                 <View style={styles.IconWrapper}>
-                  <TouchableOpacity
-                    style={styles.LikeButton}
-                    onPress={navigateBack}
-                  >
-                    <AntDesign name="hearto" size={12} color="#E05936" />
-                  </TouchableOpacity>
+                    <TouchableOpacity style={styles.LikeButton} onPress={navigateBack}>
+                      <AntDesign name="hearto" size={12} color="#E05936" />
+                    </TouchableOpacity>
                   <Text style={styles.LikeCount}>7</Text>
-                  <MaterialCommunityIcons
-                    name="message-reply-outline"
-                    size={12}
-                    color="#8892F7"
-                  />
+                  <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
                   <Text style={styles.ChatCount}>10</Text>
                 </View>
               </View>
@@ -182,11 +124,7 @@ const MyPostScreen = () => {
         onClose={() => setMiniModalVisible1(false)}
         onModify={handleModify}
         onDelete={handleDelete}
-        position={{
-          justifyContent: "flex-start",
-          alignItems: "center",
-          marginTop: 0,
-        }} // 위치 조정
+        position={{ justifyContent: 'flex-start', alignItems: 'center', marginTop: 0 }} // 위치 조정
       />
 
       <ModalComponent
@@ -194,13 +132,9 @@ const MyPostScreen = () => {
         onClose={() => setMiniModalVisible2(false)}
         onModify={handleModify}
         onDelete={handleDelete}
-        position={{
-          justifyContent: "flex-end",
-          alignItems: "center",
-          marginTop: 95,
-        }} // 다른 위치 조정
+        position={{ justifyContent: 'flex-end', alignItems: 'center', marginTop: 95 }} // 다른 위치 조정
       />
-
+      
       <Modal
         transparent={true}
         visible={modalVisible}
@@ -213,10 +147,7 @@ const MyPostScreen = () => {
               <Pressable style={styles.modalButton} onPress={handleCancel}>
                 <Text style={styles.modalButtonText}>취소</Text>
               </Pressable>
-              <Pressable
-                style={[styles.modalButton, styles.confirmButton]}
-                onPress={handleConfirm}
-              >
+              <Pressable style={[styles.modalButton, styles.confirmButton]} onPress={handleConfirm}>
                 <Text style={styles.modalButtonText}>확인</Text>
               </Pressable>
             </View>
@@ -230,60 +161,60 @@ const MyPostScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   bar: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
+    flexDirection: 'row',
+    alignItems: 'center', 
+    paddingHorizontal: 15, 
     marginTop: 12,
     marginBottom: 12,
-    width: "100%",
+    width: '100%', 
   },
   backButton: {
-    position: "absolute",
+    position: 'absolute',
     marginHorizontal: 13,
   },
   titleContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   BlogContainer: {
     flex: 1,
-    width: "100%",
+    width: '100%',
   },
   Tab: {
     height: 28,
-    flexDirection: "row",
-    backgroundColor: "#C51E3A",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    backgroundColor: '#C51E3A',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 5,
   },
   TabText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#FFFFFF",
+    fontWeight: '600',
+    color: '#FFFFFF'
   },
   BlogImage: {
-    width: "100%",
+    width: '100%',
     height: 240,
   },
   TextContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     margin: 5,
   },
   LeftContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   ProfileImage: {
     width: 37,
@@ -294,61 +225,62 @@ const styles = StyleSheet.create({
   },
   mainText: {
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 3,
   },
   subText: {
     fontSize: 7,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   Set_IconContainer: {
-    flexDirection: "column",
-    alignItems: "flex-end",
+    flexDirection: 'column',
+    alignItems: 'flex-end',
   },
   settingButton: {
     marginRight: 5,
   },
   IconWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   LikeCount: {
-    color: "#E05936",
+    color: '#E05936',
     fontSize: 14,
     marginRight: 5,
     marginLeft: 2,
   },
   ChatCount: {
-    color: "#8892F7",
+    color: '#8892F7',
     fontSize: 14,
     marginRight: 5,
     marginLeft: 2,
   },
 
+
   MvpContainer: {
     flex: 1,
-    width: "100%",
+    width: '100%',
   },
   MvpBody: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   MvpImage: {
-    width: "50%",
+    width: '50%',
   },
   MvpBodyRight: {
-    width: "50%",
-    flexDirection: "column",
+    width: '50%',
+    flexDirection: 'column',
   },
   MvpBody_1: {
-    flexDirection: "row",
+    flexDirection: 'row',
     padding: 10,
     paddingRight: 5,
     height: 95,
-    justifyContent: "space-between",
-    alignItems: "center",
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   TeamName: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   TeamLogoImage: {
     width: 35,
@@ -356,20 +288,20 @@ const styles = StyleSheet.create({
   },
   MvpName: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: '600',
     marginLeft: 8,
     marginTop: 10,
   },
   settingButtonCon: {
     width: 35,
     height: 50,
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
   },
   MvpBody_2: {
     height: 95,
     padding: 10,
     paddingVertical: 25,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   TodayText: {
     borderWidth: 1,
@@ -377,39 +309,40 @@ const styles = StyleSheet.create({
     fontSize: 8,
     padding: 3,
     width: 45,
-    textAlign: "center",
+    textAlign: 'center'
   },
   MvpBody_3: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
     padding: 10,
     height: 95,
   },
 
-  modalOverlay: {
+
+  modalOverlay:{
     flex: 1,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
-    width: "90%",
-    alignItems: "center",
+    width: '90%',
+    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 19,
-    fontWeight: "800",
+    fontWeight: '800',
     marginBottom: 15,
   },
   modalButtons: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginTop: 20,
   },
   modalButton: {
@@ -418,17 +351,17 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: 44,
     margin: 5,
-    backgroundColor: "#C51E3A",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#C51E3A',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalButtonText: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#fff",
+    fontWeight: '600',
+    color: '#fff',
   },
   confirmButton: {
-    backgroundColor: "#C51E3A",
+    backgroundColor: '#C51E3A',
   },
 });
 

@@ -3,15 +3,9 @@ import styled from "styled-components/native";
 import { colors, fonts } from "../global";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
-import BlogScreen from "./BlogScreen"; // BlogScreen을 별도 파일로 분리
-import MvpScreen from "./MvpScreen"; // MvpScreen을 별도 파일로 분리
-import {
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
-  Platform,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import BlogScreen from "./BlogScreen";
+import MvpScreen from "./MvpScreen";
+import { TouchableWithoutFeedback, Keyboard, ScrollView, Platform } from "react-native";
 
 const PostScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
@@ -52,7 +46,7 @@ const PostScreen = () => {
                 name="caretdown"
                 size={12}
                 color="black"
-                style={{ marginLeft: 5, marginTop: -3 }}
+                style={{ marginLeft: 5, marginTop: -3, }}
               />
             ) : null}
           </DropdownContainer>
