@@ -55,7 +55,7 @@ const ModifyScreen = () => {
               />
             </DropdownTouchable>
           </DropdownContainer>
-          <PostButton onPress={() => navigation.navigate("CheckPost")}>
+          <PostButton onPress={{ handleBackPress }}>
             <ButtonText>수정하기</ButtonText>
           </PostButton>
         </Bar>

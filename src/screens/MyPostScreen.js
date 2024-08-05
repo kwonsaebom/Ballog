@@ -64,7 +64,7 @@ const MyPostScreen = () => {
       <View style={styles.BlogContainer}>
         <TouchableOpacity
           style={styles.BlogButton}
-          onPress={() => navigation.navigate("CheckPost")}
+          onPress={() => navigation.navigate("CheckBlog")}
         >
           <View style={styles.Tab}>
             <Text style={styles.TabText}>BLOG</Text>
@@ -116,7 +116,10 @@ const MyPostScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.MvpContainer}>
-        <TouchableOpacity style={styles.BlogButton}>
+        <TouchableOpacity
+          style={styles.BlogButton}
+          onPress={() => navigation.navigate("CheckMVP")}
+        >
           <View style={styles.Tab}>
             <Text style={styles.TabText}>MVP</Text>
             <Text style={styles.TabText}>2024.06.25</Text>

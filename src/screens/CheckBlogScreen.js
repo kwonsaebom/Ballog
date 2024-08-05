@@ -15,7 +15,7 @@ import {
 } from "@expo/vector-icons";
 import { colors, fonts } from "../global";
 
-const CheckPost = () => {
+const CheckBlog = () => {
   const [showButtons, setShowButtons] = useState(false);
   const navigation = useNavigation();
 
@@ -218,12 +218,11 @@ const UserTypeWrapper = styled.View`
   align-self: center;
   margin: 20px 0;
   border-radius: 23px;
+  border: 1px solid ${colors.primary};
 `;
 
 const UserType = styled.Text`
   color: ${colors.primary};
-  border: 1px solid ${colors.primary};
-  border-radius: 23px;
   padding: 4px 12px;
   justify-content: center;
   font-size: ${fonts.sizes.small};
@@ -308,7 +307,6 @@ const PostFooter = styled.View`
   justify-content: space-between;
   align-items: center;
   padding: 5px 10px;
-
   border: 1px solid #dbdbdb;
 `;
 
@@ -339,4 +337,4 @@ const BookmarkImage = styled.Image`
   width: 30px;
   height: 30px;
 `;
-export default CheckPost;
+export default CheckBlog;

@@ -116,6 +116,8 @@ const UserImage = styled.Image`
   border-radius: 15px;
   justify-content: center;
   align-items: center;
+
+  margin-right: 5px;
 `;
 
 const CommentInputBox = styled.TextInput`
