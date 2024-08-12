@@ -10,11 +10,69 @@ import {
   Keyboard,
   ScrollView,
   Platform,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const PostScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
+  const [blogData, setBlogData] = useState({});
+  const onDataChange = (data) => {
+    setBlogData(data);
+  };
+
+  const submitPost = async () => {
+    const apiUrl = "https://api.ballog.store";
+    const endpoint = "/board/post";
+    const accessToken =
+      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MSIsImlhdCI6MTcyMzQ2MDUyNywiZXhwIjoxNzIzNDY3NzI3fQ.A_8nwUCngw2Z1upRhoQSmTy0Ds5zldl9oWyrj6xO2mI ";
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}${endpoint}`,
+        {
+          post_type: "blog",
+          title: blogData.title,
+          body: blogData.content,
+          imgUrls: blogData.images,
+          match_id: 0,
+        },
+        {
+          headers: {
+            Authorization: accessToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Blog Data:", blogData);
+
+      console.log("Response Status:", response.status);
+      console.log("Response Data:", response.data);
+      if (response.status === 200) {
+        Alert.alert("성공", "게시물이 성공적으로 업로드되었습니다!");
+      } else {
+        Alert.alert("오류", "게시물을 업로드하는 중 문제가 발생했습니다.");
+      }
+    } catch (error) {
+      // AxiosError 세부 사항 출력
+      if (error.response) {
+        // 서버가 응답을 반환한 경우
+        console.error("Error Response Data:", error.response.data);
+        console.error("Error Response Status:", error.response.status);
+        console.error("Error Response Headers:", error.response.headers);
+        Alert.alert("서버 오류", "서버에서 처리 중 문제가 발생했습니다.");
+      } else if (error.request) {
+        // 요청이 서버로 전송되었으나 응답이 없는 경우
+        console.error("Error Request:", error.request);
+        Alert.alert("요청 오류", "서버에서 응답을 받지 못했습니다.");
+      } else {
+        // 오류가 발생한 경우
+        console.error("Error Message:", error.message);
+        Alert.alert("오류", "요청 중 문제가 발생했습니다.");
+      }
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -56,13 +114,15 @@ const PostScreen = () => {
               />
             ) : null}
           </DropdownContainer>
-          <PostButton>
+          <PostButton onPress={submitPost}>
             <ButtonText>등록하기</ButtonText>
           </PostButton>
         </Bar>
 
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {selectedValue === "blog" && <BlogScreen />}
+          {selectedValue === "blog" && (
+            <BlogScreen onDataChange={onDataChange} />
+          )}
           {selectedValue === "mvp" && <MvpScreen />}
         </ScrollView>
       </Container>

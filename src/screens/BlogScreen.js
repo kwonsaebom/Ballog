@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components/native";
 import { colors, fonts } from "../global";
+
 import {
   AntDesign,
   FontAwesome5,
@@ -19,7 +20,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-const BlogScreen = () => {
+const BlogScreen = ({ onDataChange }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [gameDate, setGameDate] = useState(null);
@@ -36,9 +37,12 @@ const BlogScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        alert("죄송합니다. 이 기능을 사용하려면 사진 보관함 접근 권한이 필요합니다.");
+        alert(
+          "죄송합니다. 이 기능을 사용하려면 사진 보관함 접근 권한이 필요합니다."
+        );
       }
     })();
   }, []);
@@ -66,6 +70,9 @@ const BlogScreen = () => {
     }
   };
 
+  useEffect(() => {
+    console.log("Current images:", images); // 상태 확인용 로그
+  }, [images]);
   const handleRemoveImage = (uri) => {
     setImages((prevImages) => prevImages.filter((image) => image !== uri));
   };
@@ -133,6 +140,15 @@ const BlogScreen = () => {
     h5: 10,
   };
 
+  useEffect(() => {
+    onDataChange({
+      title,
+      content,
+      images,
+      gameDate,
+    });
+  }, [title, content, images, gameDate]);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -146,7 +162,7 @@ const BlogScreen = () => {
             <ResultButton onPress={() => setDatePickerVisibility(true)}>
               <ResultText>
                 {gameDate
-                  ? gameDate.toLocaleString()
+                  ? gameDate.toLocaleDateString()
                   : "경기 결과를 추가하세요."}
               </ResultText>
               <FontAwesome5 name="calendar-alt" size={24} color={colors.icon} />
@@ -168,7 +184,7 @@ const BlogScreen = () => {
           />
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
-            mode="datetime"
+            mode="date"
             onConfirm={handleConfirm}
             onCancel={() => setDatePickerVisibility(false)}
           />
