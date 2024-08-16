@@ -1,11 +1,12 @@
 // ClipsScreen.js
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import VideoScreen from "./video"
 
 const ClipsScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>경기 짤방</Text>
+      <VideoScreen />
     </View>
   );
 };
