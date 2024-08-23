@@ -26,13 +26,12 @@ const PostScreen = () => {
     const apiUrl = "https://api.ballog.store";
     const endpoint = "/board/post";
     const accessToken =
-      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MSIsImlhdCI6MTcyMzQ2MDUyNywiZXhwIjoxNzIzNDY3NzI3fQ.A_8nwUCngw2Z1upRhoQSmTy0Ds5zldl9oWyrj6xO2mI ";
-
+      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MSIsImlhdCI6MTcyNDM5NzY1NywiZXhwIjoxNzI0NDA0ODU3fQ.YFJhuPnXrXk-VTMtLeAioJPg-B2e6vtXwLiHd51uWEk ";
     try {
       const response = await axios.post(
         `${apiUrl}${endpoint}`,
         {
-          post_type: "blog",
+          post_type: selectedValue,
           title: blogData.title,
           body: blogData.content,
           imgUrls: blogData.images,
@@ -58,9 +57,6 @@ const PostScreen = () => {
       // AxiosError 세부 사항 출력
       if (error.response) {
         // 서버가 응답을 반환한 경우
-        console.error("Error Response Data:", error.response.data);
-        console.error("Error Response Status:", error.response.status);
-        console.error("Error Response Headers:", error.response.headers);
         Alert.alert("서버 오류", "서버에서 처리 중 문제가 발생했습니다.");
       } else if (error.request) {
         // 요청이 서버로 전송되었으나 응답이 없는 경우

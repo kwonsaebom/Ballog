@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components/native";
 import {
   TouchableWithoutFeedback,
@@ -14,10 +14,68 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 import { colors, fonts } from "../global";
+import axios from "axios";
+import { API_TOKEN } from "@env";
+
+const teamImages = {
+  두산: require("../assets/Teams/Doosan.png"),
+  한화: require("../assets/Teams/Hanwha.png"),
+  기아: require("../assets/Teams/KIA.png"),
+  키움: require("../assets/Teams/Kiwoom.png"),
+  KT: require("../assets/Teams/KT.png"),
+  LG: require("../assets/Teams/LG.png"),
+  롯데: require("../assets/Teams/LOTTE.png"),
+  NC: require("../assets/Teams/NC.png"),
+  삼성: require("../assets/Teams/Samsung.png"),
+  신세계: require("../assets/Teams/SSG.png"),
+
+  // 추가적인 팀 이미지 경로는 여기에 추가
+};
+
+const getTeamImage = (teamName) =>
+  teamImages[teamName] || require("../assets/icon.png"); // 기본 이미지 경로를 추가할 수 있음
 
 const CheckBlog = () => {
   const [showButtons, setShowButtons] = useState(false);
+  const [blogData, setBlogData] = useState(null);
+
   const navigation = useNavigation();
+  const apiUrl = "https://api.ballog.store";
+  const post_id = 82;
+
+  useEffect(() => {
+    console.log(`Fetching data from ${apiUrl}/board/post/${post_id}`);
+    axios
+      .get(`${apiUrl}/board/post/${post_id}`, {
+        headers: {
+          Authorization: `Bearer ${API_TOKEN}`,
+          "Content-Type": "application/json",
+          Accept: "application/json", // Ensure server responds with JSON
+        },
+      })
+      .then((response) => {
+        console.log("API Response Status:", response.status);
+        console.log("API Response Headers:", response.headers);
+        console.log("API Response Data:", response.data);
+        setBlogData(response.data.result); // Save response data to state
+      })
+      .catch((error) => {
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error("API Error Response Status:", error.response.status);
+          console.error("API Error Response Headers:", error.response.headers);
+          console.error("API Error Response Data:", error.response.data);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("API Error Request:", error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error("API Error Message:", error.message);
+        }
+        console.error("API Error Config:", error.config);
+      });
+  }, [post_id]);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -43,6 +101,16 @@ const CheckBlog = () => {
     );
   };
 
+  // ContentImage의 source 속성 값 결정
+  const getContentImages = () => {
+    if (blogData && blogData.img_urls && blogData.img_urls.length > 0) {
+      return blogData.img_urls.map((url, index) => (
+        <ContentImage key={index} source={{ uri: url }} />
+      ));
+    }
+    return <ContentImage source={require("../assets/imgs/sampleImg.png")} />;
+  };
+
   return (
     <Wrapper>
       <UserHeader>
@@ -51,7 +119,7 @@ const CheckBlog = () => {
         </BackButton>
         <UserWrapper>
           <FileIcon source={require("../assets/Order.png")} />
-          <UserName>홍길동</UserName>
+          <UserName>{blogData ? blogData.user_name : "Loading..."}</UserName>
         </UserWrapper>
       </UserHeader>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -80,28 +148,45 @@ const CheckBlog = () => {
 
           <TitleWrapper>
             <UserTypeWrapper>
-              <UserType>BLOG</UserType>
+              <UserType>
+                {blogData ? blogData.post_type.toUpperCase() : "Loading..."}
+              </UserType>
             </UserTypeWrapper>
-            <Title>첫 직관 후기</Title>
-            <UserImage source={require("../assets/Profile.png")} />
-            <DateTime>2024.06.24</DateTime>
+            <Title>{blogData ? blogData.title : "Loading..."}</Title>
+            <UserImage
+              source={
+                blogData
+                  ? { uri: blogData.user_icon_url }
+                  : require("../assets/Profile.png")
+              }
+            />
+            <DateTime>{blogData ? blogData.created_at : "Loading..."}</DateTime>
           </TitleWrapper>
           <ScoreWrapper>
             <ScoreDate>
-              <DateText>6/24 경기</DateText>
+              <DateText>
+                {blogData
+                  ? `${blogData.match_info.match_date} 경기`
+                  : "Loading..."}
+              </DateText>
             </ScoreDate>
             <Score>
-              <ScoreImage source={require("../assets/Teams/Doosan.png")} />
-              <ScoreNum>5 : 3</ScoreNum>
-              <ScoreImage source={require("../assets/Teams/LG.png")} />
+              <ScoreImage
+                source={getTeamImage(blogData?.match_info?.home_team_name)}
+              />
+              <ScoreNum>
+                {blogData ? blogData.match_info.home_team_score : "Loading..."}{" "}
+                :{" "}
+                {blogData ? blogData.match_info.away_team_score : "Loading..."}
+              </ScoreNum>
+              <ScoreImage
+                source={getTeamImage(blogData?.match_info?.away_team_name)}
+              />
             </Score>
           </ScoreWrapper>
           <ContentWrapper>
-            <ContentText>
-              안녕하세요. 오늘은 야구 경기 직관 후기를 적어보도록 하겠습니다.
-              오늘의 간식은 치킨이었습니다. 직관하며 먹으니 더욱 꿀맛이었습니다.
-            </ContentText>
-            <ContentImage source={require("../assets/imgs/sampleImg.png")} />
+            <ContentText>{blogData ? blogData.body : "Loading..."}</ContentText>
+            {getContentImages()}
           </ContentWrapper>
         </Container>
       </ScrollView>
@@ -111,7 +196,7 @@ const CheckBlog = () => {
           <LikeIcon>
             <AntDesign name="hearto" size={21} color="#E05936" />
           </LikeIcon>
-          <LikeCount>7</LikeCount>
+          <LikeCount>{blogData ? blogData.like_count : "Loading..."}</LikeCount>
           <ChatIcon onPress={() => navigation.navigate("Comment")}>
             <MaterialCommunityIcons
               name="message-reply-outline"
@@ -119,7 +204,9 @@ const CheckBlog = () => {
               color="#8892F7"
             />
           </ChatIcon>
-          <ChatCount>7</ChatCount>
+          <ChatCount>
+            {blogData ? blogData.comment_count : "Loading..."}
+          </ChatCount>
         </IconWrapper>
         <BookmarkButton>
           <BookmarkImage source={require("../assets/Bookmark.png")} />
