@@ -45,6 +45,7 @@ const CheckBlog = () => {
 
   useEffect(() => {
     console.log(`Fetching data from ${apiUrl}/board/post/${post_id}`);
+    console.log("API_TOKEN:", API_TOKEN);
     axios
       .get(`${apiUrl}/board/post/${post_id}`, {
         headers: {
@@ -197,7 +198,7 @@ const CheckBlog = () => {
             <AntDesign name="hearto" size={21} color="#E05936" />
           </LikeIcon>
           <LikeCount>{blogData ? blogData.like_count : "Loading..."}</LikeCount>
-          <ChatIcon onPress={() => navigation.navigate("Comment")}>
+          <ChatIcon onPress={() => navigation.navigate("Comment", { post_id })}>
             <MaterialCommunityIcons
               name="message-reply-outline"
               size={21}
@@ -205,7 +206,7 @@ const CheckBlog = () => {
             />
           </ChatIcon>
           <ChatCount>
-            {blogData ? blogData.comment_count : "Loading..."}
+            {blogData ? blogData.comment_list.length : "Loading..."}
           </ChatCount>
         </IconWrapper>
         <BookmarkButton>
