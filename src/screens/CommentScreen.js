@@ -5,12 +5,7 @@ import {
   ScrollView,
   Platform,
   Keyboard,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Dimensions,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons, Feather } from "@expo/vector-icons";
@@ -23,7 +18,7 @@ const Comment = () => {
   const { post_id } = route.params;
   const [blogData, setBlogData] = useState(null);
   const [newComment, setNewComment] = useState("");
-  const [replyText, setReplyText] = useState("");
+  const [newReply, setNewReply] = useState("");
   const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -49,6 +44,10 @@ const Comment = () => {
     };
   }, []);
 
+  const handleDismissKeyboard = () => {
+    Keyboard.dismiss();
+    setSelectedCommentId(null); // 터치 시 답글 입력 모드를 해제
+  };
   const fetchBlogData = async () => {
     try {
       const apiUrl = "https://api.ballog.store";
@@ -92,18 +91,25 @@ const Comment = () => {
       console.error("Error submitting comment:", error);
     }
   };
-  const handleReply = async () => {
-    if (!replyText.trim() || selectedCommentId === null) return;
+
+  const getRepliesForComment = (commentId) => {
+    return blogData.reply_list.filter(
+      (reply) => reply.commented_id === commentId
+    );
+  };
+
+  const handleSubmitReply = async () => {
+    if (!newReply.trim()) return;
 
     try {
       const apiUrl = "https://api.ballog.store";
       await axios.post(
         `${apiUrl}/api-utils/reply`,
         {
-          body: replyText,
+          body: newReply,
           post_id: post_id,
           post_user_id: blogData.user_id,
-          comment_id: selectedCommentId,
+          comment_id: selectedCommentId, // selectedCommentId 추가
           post_type: "blog",
         },
         {
@@ -114,149 +120,150 @@ const Comment = () => {
           },
         }
       );
-      setReplyText("");
-      setSelectedCommentId(null);
+      setNewReply("");
+      setSelectedCommentId(null); // 답글 작성 후 초기화
       await fetchBlogData();
     } catch (error) {
       console.error("Error submitting reply:", error);
     }
   };
-  const getRepliesForComment = (commentId) => {
-    return blogData.reply_list.filter(
-      (reply) => reply.commented_id === commentId
-    );
-  };
 
   return (
-    <Wrapper>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={80}
-      >
-        <CommentHeader>
-          <BackButton onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color="black" />
-          </BackButton>
-          <CommentWrapper>
-            <CommentIcon source={require("../assets/Chat.png")} />
-            <CommentText>
-              댓글 {blogData ? blogData.comment_list.length : "Loading..."}
-            </CommentText>
-          </CommentWrapper>
-        </CommentHeader>
-        <ContentWrapper>
-          <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              paddingBottom: keyboardHeight + 80,
-            }}
-          >
-            <Container>
-              {blogData && blogData.comment_list
-                ? blogData.comment_list.map((comment) => (
-                    <CommentsBoxWrapper key={comment.comment_id}>
-                      <CommentsBox>
-                        <UserInfo>
-                          <UserNameWrapper>
-                            <UserImage
-                              source={require("../assets/Profile.png")}
-                            />
-                            <UserName>
-                              {comment.comment_user_name}
-                              {"  "}
-                              {comment.comment_user_id == blogData.user_id && (
-                                <MeBox>
-                                  <Me>나</Me>
-                                </MeBox>
-                              )}
-                            </UserName>
-                          </UserNameWrapper>
-                        </UserInfo>
-                        <DetailTimeWrapper>
-                          <CommentDetail>{comment.comment_body}</CommentDetail>
-                          <DetailFooter>
-                            <DateTime>{comment.comment_date}</DateTime>
-                            <ReplyButton
-                              onPress={() =>
-                                setSelectedCommentId(comment.comment_id)
-                              }
-                            >
-                              <ReplyButtonText>답글</ReplyButtonText>
-                            </ReplyButton>
-                          </DetailFooter>
-                        </DetailTimeWrapper>
-                      </CommentsBox>
-                      {getRepliesForComment(comment.comment_id).length > 0 && (
-                        <RepliesWrapper>
-                          {getRepliesForComment(comment.comment_id).map(
-                            (reply) => (
-                              <CommentsBoxWrapper key={reply.reply_id}>
-                                <CommentsBox>
-                                  <UserInfo>
-                                    <UserNameWrapper>
-                                      <ReplyIcon
-                                        source={require("../assets/ReplyIcon.png")} // Ensure you have this asset
-                                      />
-                                      <UserImage
-                                        source={require("../assets/Profile.png")}
-                                      />
-                                      <UserName>
-                                        {reply.reply_user_name}
-                                      </UserName>
-                                    </UserNameWrapper>
-                                  </UserInfo>
-                                  <DetailTimeWrapper>
-                                    <CommentDetail>
-                                      {reply.reply_body}
-                                    </CommentDetail>
-                                    <DetailFooter>
-                                      <DateTime>{reply.reply_date}</DateTime>
-                                    </DetailFooter>
-                                  </DetailTimeWrapper>
-                                </CommentsBox>
-                              </CommentsBoxWrapper>
-                            )
-                          )}
-                        </RepliesWrapper>
-                      )}
-                    </CommentsBoxWrapper>
-                  ))
-                : null}
-            </Container>
-          </ScrollView>
-          <CommentsFooter>
-            <InputBoxWrapper>
-              <UserImage source={require("../assets/Profile.png")} />
-              <CommentInputBox
-                placeholder="댓글을 입력해주세요"
-                placeholderTextColor={"#B5B5B5"}
-                multiline
-                value={newComment}
-                onChangeText={(text) => setNewComment(text)}
-              />
-              <UploadButton onPress={handleSubmitComment}>
-                <Feather name="send" size={24} color="#C51E3A" />
-              </UploadButton>
-            </InputBoxWrapper>
-            {selectedCommentId !== null && (
-              <ReplyInputWrapper>
-                <ReplyInputBox
-                  placeholder="답글을 입력해주세요"
-                  placeholderTextColor={"#B5B5B5"}
-                  multiline
-                  value={replyText}
-                  onChangeText={(text) => setReplyText(text)}
-                />
-                <ReplyButton onPress={handleReply}>
+    <TouchableWithoutFeedback onPress={handleDismissKeyboard}>
+      <Wrapper>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={80}
+        >
+          <CommentHeader>
+            <BackButton onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={24} color="black" />
+            </BackButton>
+            <CommentWrapper>
+              <CommentIcon source={require("../assets/Chat.png")} />
+              <CommentText>
+                댓글 {blogData ? blogData.comment_list.length : "Loading..."}
+              </CommentText>
+            </CommentWrapper>
+          </CommentHeader>
+          <ContentWrapper>
+            <ScrollView
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingBottom: keyboardHeight + 80,
+              }}
+            >
+              <Container>
+                {blogData && blogData.comment_list
+                  ? blogData.comment_list.map((comment) => (
+                      <CommentsBoxWrapper key={comment.comment_id}>
+                        <CommentsBox>
+                          <UserInfo>
+                            <UserNameWrapper>
+                              <UserImage
+                                source={require("../assets/Profile.png")}
+                              />
+                              <UserName>
+                                {comment.comment_user_name}
+                                {"  "}
+                                {comment.comment_user_id ==
+                                  blogData.user_id && (
+                                  <MeBox>
+                                    <Me>나</Me>
+                                  </MeBox>
+                                )}
+                              </UserName>
+                            </UserNameWrapper>
+                          </UserInfo>
+                          <DetailTimeWrapper>
+                            <CommentDetail>
+                              {comment.comment_body}
+                            </CommentDetail>
+                            <DetailFooter>
+                              <DateTime>{comment.comment_date}</DateTime>
+                              <ReplyButton
+                                onPress={() =>
+                                  setSelectedCommentId(comment.comment_id)
+                                }
+                              >
+                                <ReplyButtonText>답글</ReplyButtonText>
+                              </ReplyButton>
+                            </DetailFooter>
+                          </DetailTimeWrapper>
+                        </CommentsBox>
+                        {getRepliesForComment(comment.comment_id).length >
+                          0 && (
+                          <RepliesWrapper>
+                            {getRepliesForComment(comment.comment_id).map(
+                              (reply) => (
+                                <CommentsBoxWrapper key={reply.reply_id}>
+                                  <CommentsBox>
+                                    <UserInfo>
+                                      <UserNameWrapper>
+                                        <ReplyIcon
+                                          source={require("../assets/ReplyIcon.png")}
+                                        />
+                                        <UserImage
+                                          source={require("../assets/Profile.png")}
+                                        />
+                                        <UserName>
+                                          {reply.reply_user_name}
+                                        </UserName>
+                                      </UserNameWrapper>
+                                    </UserInfo>
+                                    <DetailTimeWrapper>
+                                      <CommentDetail>
+                                        {reply.reply_body}
+                                      </CommentDetail>
+                                      <DetailFooter>
+                                        <DateTime>{reply.reply_date}</DateTime>
+                                      </DetailFooter>
+                                    </DetailTimeWrapper>
+                                  </CommentsBox>
+                                </CommentsBoxWrapper>
+                              )
+                            )}
+                          </RepliesWrapper>
+                        )}
+                      </CommentsBoxWrapper>
+                    ))
+                  : null}
+              </Container>
+            </ScrollView>
+            <CommentsFooter>
+              <InputBoxWrapper>
+                <UserImage source={require("../assets/Profile.png")} />
+                {selectedCommentId ? (
+                  <CommentInputBox
+                    placeholder="답글을 입력해주세요"
+                    placeholderTextColor={"#B5B5B5"}
+                    multiline
+                    value={newReply}
+                    onChangeText={(text) => setNewReply(text)}
+                  />
+                ) : (
+                  <CommentInputBox
+                    placeholder="댓글을 입력해주세요"
+                    placeholderTextColor={"#B5B5B5"}
+                    multiline
+                    value={newComment}
+                    onChangeText={(text) => setNewComment(text)}
+                  />
+                )}
+                <UploadButton
+                  onPress={
+                    selectedCommentId ? handleSubmitReply : handleSubmitComment
+                  }
+                >
                   <Feather name="send" size={24} color="#C51E3A" />
-                </ReplyButton>
-              </ReplyInputWrapper>
-            )}
-          </CommentsFooter>
-        </ContentWrapper>
-      </KeyboardAvoidingView>
-    </Wrapper>
+                </UploadButton>
+              </InputBoxWrapper>
+            </CommentsFooter>
+          </ContentWrapper>
+        </KeyboardAvoidingView>
+      </Wrapper>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -386,7 +393,7 @@ const MeBox = styled.TouchableOpacity`
   border-width: 0.5px;
   border-color: #c51e3a;
   border-radius: 20px;
-  padding: 2px 7px;
+  padding: 2px 7ch;
   justify-content: center;
   align-items: center;
   margin-top: -2px;
@@ -396,6 +403,7 @@ const Me = styled.Text`
   font-family: "Inter-Regular";
   font-size: 9px;
   color: #c51e3a;
+  padding: 0 5px;
 `;
 
 const CommentsFooter = styled.View`
