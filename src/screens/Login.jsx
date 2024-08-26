@@ -9,6 +9,7 @@ const Login = () => {
   let code;
   const [modalVisible, setModalVisible] = useState(false);
   const [modalUrl, setModalUrl] = useState(null);
+  const navigation = useNavigation(); // Initialize navigation
   const onPressHandler = () => {
     navigation.navigate('ProfileImage'); // Navigate to LoginPage
 };
