@@ -35,14 +35,11 @@ const Login = () => {
     const url = navState.url;
     const targetString = modalUrl;
     if (url.includes(targetString+'/redirect') && !url.includes('oauth') && url !== preUrl) {
-      console.log("3. ", preUrl)
-      console.log("2. ", url)
       code = url.split('?')[1]
       const redirect_url = modalUrl + '/token?' + code
       fetchData(redirect_url);
       setModalVisible(false);
       preUrl = url;
-      console.log("4. ", preUrl)
     }    
   };
 
