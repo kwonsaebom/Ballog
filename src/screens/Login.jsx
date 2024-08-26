@@ -2,44 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, Modal, Button } from 'react-native';
 import { colors } from '../global';
 import { WebView } from 'react-native-webview'; // WebView import
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 const Login = () => {
   let code;
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalUrl, setModalUrl] = useState(null); //
-
+  const [modalUrl, setModalUrl] = useState(null);
+  const onPressHandler = () => {
+    navigation.navigate('ProfileImage'); // Navigate to LoginPage
+};
   const fetchData = async (url) => {
     try {
-      console.log("1. ", url)
-      // GET 요청을 보내고 응답을 받아옵니다.
       const response = await axios.get(url);
-  
-      // 응답에서 데이터와 헤더를 읽습니다.
       const data = response.data;
       const headers = response.headers;
-  
-      // 데이터와 헤더를 콘솔에 출력합니다.
       console.log('Response Headers:', headers);
     } catch (error) {
-      // 오류가 발생하면 콘솔에 출력합니다.
       console.error('Error fetching data:', error);
     }
   };
   
-  // 함수를 호출하여 데이터를 가져옵니다.
-  
-  let preUrl;
   const handleNavigationStateChange = (navState) => {
-    
     const url = navState.url;
     const targetString = modalUrl;
-    if (url.includes(targetString+'/redirect') && !url.includes('oauth') && url !== preUrl) {
+    if (url.includes(targetString+'/redirect') && !url.includes('oauth')) {
       code = url.split('?')[1]
       const redirect_url = modalUrl + '/token?' + code
       fetchData(redirect_url);
       setModalVisible(false);
-      preUrl = url;
+      onPressHandler()
     }    
   };
 
