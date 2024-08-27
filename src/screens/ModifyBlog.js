@@ -17,14 +17,21 @@ import {
   ScrollView,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
+import axios from "axios";
+import { API_TOKEN } from "@env";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const ModifyBlog = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { post_id } = route.params || {}; // 안전하게 접근하기 위해 디폴트 객체 사용
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [gameDate, setGameDate] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [images, setImages] = useState([]); // 여러 이미지를 저장할 배열 상태
+  const [images, setImages] = useState([]);
   const [showTextOptions, setShowTextOptions] = useState(false);
   const [showLineSpacingOptions, setShowLineSpacingOptions] = useState(false);
   const [showColorOptions, setShowColorOptions] = useState(false);
@@ -32,6 +39,61 @@ const ModifyBlog = () => {
   const [textAlign, setTextAlign] = useState("left");
   const [textColor, setTextColor] = useState(colors.text);
   const [textSize, setTextSize] = useState(fonts.sizes.small);
+
+  useEffect(() => {
+    if (post_id) {
+      const fetchBlogData = async () => {
+        try {
+          const response = await axios.get(
+            `https://api.ballog.store/board/post/${post_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${API_TOKEN}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            }
+          );
+          const data = response.data.result;
+          setTitle(data.title);
+          setContent(data.body);
+          setGameDate(data.game_date ? new Date(data.game_date) : null);
+          setImages(data.images || []);
+        } catch (error) {
+          console.error("Error fetching blog data:", error);
+          Alert.alert("Error", "Failed to fetch blog data.");
+        }
+      };
+
+      fetchBlogData();
+    }
+  }, [post_id]);
+
+  const handleSave = async () => {
+    try {
+      await axios.put(
+        `https://api.ballog.store/board/post/${post_id}`,
+        {
+          title,
+          body: content,
+          img_urls: images, // 수정된 내용: `images`를 `img_urls`로 전송
+          game_date: gameDate ? gameDate.toISOString() : null,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${API_TOKEN}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+      Alert.alert("Success", "Blog post updated successfully.");
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error updating blog post:", error);
+      Alert.alert("Error", "Failed to update blog post.");
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -55,7 +117,7 @@ const ModifyBlog = () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: true, // 여러 이미지 선택 허용
+        allowsMultipleSelection: true,
         quality: 1,
       });
 

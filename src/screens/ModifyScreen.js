@@ -2,22 +2,88 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components/native";
 import { colors, fonts } from "../global";
 import RNPickerSelect from "react-native-picker-select";
+import {
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import axios from "axios";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import BlogScreen from "./ModifyBlog"; // BlogScreen을 별도 파일로 분리
 import MvpScreen from "./ModifyMvp"; // MvpScreen을 별도 파일로 분리
-import { TouchableWithoutFeedback, Keyboard, ScrollView } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { API_TOKEN } from "@env";
 
 const ModifyScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
+  const [post_id, setPostId] = useState(null); // post_id를 저장할 상태
   const navigation = useNavigation();
-
   const route = useRoute();
 
-  const { post_id } = route.params;
+  useEffect(() => {
+    // route.params에서 post_id 가져오기
+    if (route.params?.post_id) {
+      setPostId(route.params.post_id);
+    }
+  }, [route.params]);
 
   const handleBackPress = () => {
     navigation.goBack();
+  };
+
+  const handleUpdate = async () => {
+    try {
+      if (!post_id) {
+        Alert.alert("Error", "Post ID is missing.");
+        return;
+      }
+
+      // selectedValue에 따라 BlogScreen 또는 MvpScreen에서 업데이트 요청 처리
+      if (selectedValue === "blog") {
+        // BlogScreen에서 데이터 가져와서 업데이트
+        await axios.patch(
+          `https://api.ballog.store/board/post/${post_id}`,
+          {
+            post_type: "blog", // post_type 필드 추가
+            title: "Updated Title",
+            body: "Updated Content",
+            img_urls: [], // 필요에 따라 수정
+            match_id: 0, // match_id 필드 추가, 실제 값을 설정해야 합니다.
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${API_TOKEN}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
+        );
+      } else if (selectedValue === "mvp") {
+        // MvpScreen에서 데이터 가져와서 업데이트
+        await axios.patch(
+          `https://api.ballog.store/board/mvp/${post_id}`,
+          {
+            post_type: "mvp", // post_type 필드 추가
+            title: "Updated Title",
+            body: "Updated Content",
+            img_urls: [], // 필요에 따라 수정
+            match_id: 0, // match_id 필드 추가, 실제 값을 설정해야 합니다.
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${API_TOKEN}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+          }
+        );
+      }
+      Alert.alert("Success", "Data updated successfully.");
+    } catch (error) {
+      console.error("Error updating data:", error);
+      Alert.alert("Error", "Failed to update data.");
+    }
   };
 
   return (
@@ -59,13 +125,12 @@ const ModifyScreen = () => {
               />
             </DropdownTouchable>
           </DropdownContainer>
-          <PostButton onPress={handleBackPress}>
+          <PostButton onPress={handleUpdate}>
             <ButtonText>수정하기</ButtonText>
           </PostButton>
         </Bar>
-
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {selectedValue === "blog" && <BlogScreen />}
+          {selectedValue === "blog" && <BlogScreen post_id={post_id} />}
           {selectedValue === "mvp" && <MvpScreen />}
         </ScrollView>
       </Container>

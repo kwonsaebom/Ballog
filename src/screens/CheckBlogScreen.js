@@ -42,6 +42,16 @@ const CheckBlog = () => {
     blogData ? blogData.like_count : 0
   );
 
+  const createdDate = blogData
+    ? blogData.match_info.match_date.split("T")[0]
+    : "Loading...";
+  const gameDate = blogData
+    ? new Date(blogData.created_at).toLocaleDateString("en-US", {
+        month: "numeric",
+        day: "numeric",
+      })
+    : "Loading...";
+
   useEffect(() => {
     if (blogData) {
       setLikeCount(blogData.like_count);
@@ -69,20 +79,35 @@ const CheckBlog = () => {
         console.log("API Response Status:", response.status);
         console.log("API Response Headers:", response.headers);
         console.log("API Response Data:", response.data);
-        setBlogData(response.data.result); // Save response data to state
+
+        if (response.data.result === null || response.data.deleted) {
+          // 게시글이 삭제된 상태라면
+          Alert.alert("삭제된 게시글", "이 게시글은 삭제되었습니다.", [
+            { text: "확인", onPress: () => navigation.goBack() },
+          ]);
+        } else {
+          setBlogData(response.data.result); // Save response data to state
+        }
       })
       .catch((error) => {
         if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
           console.error("API Error Response Status:", error.response.status);
           console.error("API Error Response Headers:", error.response.headers);
           console.error("API Error Response Data:", error.response.data);
+
+          if (error.response.status === 404) {
+            // 404 에러(삭제된 게시글일 가능성 있음)
+            Alert.alert("삭제된 게시글", "이 게시글은 삭제되었습니다.", [
+              { text: "확인", onPress: () => navigation.goBack() },
+            ]);
+          } else {
+            Alert.alert("오류", "게시글을 불러오는 데 문제가 발생했습니다.", [
+              { text: "확인", onPress: () => navigation.goBack() },
+            ]);
+          }
         } else if (error.request) {
-          // The request was made but no response was received
           console.error("API Error Request:", error.request);
         } else {
-          // Something happened in setting up the request that triggered an Error
           console.error("API Error Message:", error.message);
         }
         console.error("API Error Config:", error.config);
@@ -116,14 +141,18 @@ const CheckBlog = () => {
           onPress: () => {
             console.log("삭제 요청 전송");
 
-            axios
-              .delete(`${apiUrl}/board/post/${post_id}`, {
-                headers: {
-                  Authorization: `Bearer ${API_TOKEN}`,
-                  "Content-Type": "application/json",
-                  Accept: "application/json",
-                },
-              })
+            axios({
+              method: "delete",
+              url: `${apiUrl}/board/post/${post_id}`,
+              headers: {
+                Authorization: `Bearer ${API_TOKEN}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+              data: {
+                post_type: "blog", // 요청 본문 데이터 추가
+              },
+            })
               .then((response) => {
                 console.log("삭제 성공:", response.status);
                 console.log("삭제 응답 데이터:", response.data);
@@ -164,13 +193,16 @@ const CheckBlog = () => {
       blogData.img_urls.imgUrls &&
       blogData.img_urls.imgUrls.length > 0
     ) {
-      return blogData.img_urls.imgUrls.map((url, index) => (
-        <ContentImage key={index} source={{ uri: url }} />
-      ));
+      return blogData.img_urls.imgUrls.map((url, index) => {
+        // url이 유효한 경우에만 ContentImage를 렌더링
+        if (url) {
+          return <ContentImage key={index} source={{ uri: url }} />;
+        }
+        return null; // url이 유효하지 않으면 아무것도 렌더링하지 않음
+      });
     }
-    return <ContentImage source={require("../assets/imgs/sampleImg.png")} />;
+    return null; // 이미지가 없으면 아무것도 렌더링하지 않음
   };
-
   return (
     <Wrapper>
       <UserHeader>
@@ -191,7 +223,9 @@ const CheckBlog = () => {
           </SettingWrapper>
           {showButtons && (
             <ButtonWrapper>
-              <EditDeleteButton onPress={() => navigation.navigate("Modify")}>
+              <EditDeleteButton
+                onPress={() => navigation.navigate("Modify", { post_id })}
+              >
                 <ButtonText>수정</ButtonText>
                 <MaterialCommunityIcons
                   name="pencil-outline"
@@ -220,15 +254,11 @@ const CheckBlog = () => {
                   : require("../assets/Profile.png")
               }
             />
-            <DateTime>{blogData ? blogData.created_at : "Loading..."}</DateTime>
+            <DateTime>{createdDate}</DateTime>
           </TitleWrapper>
           <ScoreWrapper>
             <ScoreDate>
-              <DateText>
-                {blogData
-                  ? `${blogData.match_info.match_date} 경기`
-                  : "Loading..."}
-              </DateText>
+              <DateText>{gameDate} 경기</DateText>
             </ScoreDate>
             <Score>
               <ScoreImage
@@ -414,8 +444,9 @@ const ScoreDate = styled.View`
 
 const DateText = styled.Text`
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   color: black;
+  font-weight: 900;
 `;
 
 const Score = styled.View`
