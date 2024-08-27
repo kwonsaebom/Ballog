@@ -19,9 +19,9 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-const MVPScreen = () => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+const MVPScreen = ({ onDataChange }) => {
+  const [playerId, setPlayerId] = useState(0);
+  const [playerRecord, setPlayerRecord] = useState("");
   const [gameDate, setGameDate] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [images, setImages] = useState([]);
@@ -72,6 +72,10 @@ const MVPScreen = () => {
     }
   };
 
+  useEffect(() => {
+    console.log("Player images:", images); // 상태 확인용 로그
+  }, [images]);
+
   const pickImages = async () => {
     console.log("pickImages function called");
     try {
@@ -89,6 +93,10 @@ const MVPScreen = () => {
       console.error("Error picking images:", error);
     }
   };
+
+  useEffect(() => {
+    console.log("Current images:", images); // 상태 확인용 로그
+  }, [images]);
 
   const handleRemoveImage = (uri) => {
     setImages((prevImages) => prevImages.filter((image) => image !== uri));
@@ -161,14 +169,22 @@ const MVPScreen = () => {
     h5: 10,
   };
 
+  useEffect(() => {
+    onDataChange({
+      playerId,
+      playerRecord,
+      images,
+    });
+  }, [playerId, playerRecord, images]);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <ContentContainer>
           <TitleInput
             placeholder="선수 이름을 입력하세요"
-            value={title}
-            onChangeText={setTitle}
+            value={playerId}
+            onChangeText={setPlayerId}
           />
           <PlayerContainer>
             {playerImage ? (
@@ -199,8 +215,8 @@ const MVPScreen = () => {
           </ResultContainer>
           <ContentInput
             placeholder="오늘의 기록을 입력하세요."
-            value={content}
-            onChangeText={setContent}
+            value={playerRecord}
+            onChangeText={setPlayerRecord}
             multiline
             color={textColor}
             style={{
@@ -219,7 +235,7 @@ const MVPScreen = () => {
             onCancel={() => setDatePickerVisibility(false)}
           />
           <ElementContainer>
-          <PhotoButton onPress={pickImages}>
+            <PhotoButton onPress={pickImages}>
               <Feather name="camera" size={24} color={colors.icon} />
             </PhotoButton>
             <TextButton onPress={toggleTextOptions}>

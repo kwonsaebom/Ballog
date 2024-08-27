@@ -6,7 +6,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -38,10 +38,21 @@ const getTeamImage = (teamName) =>
 const CheckBlog = () => {
   const [showButtons, setShowButtons] = useState(false);
   const [blogData, setBlogData] = useState(null);
+  const [likeCount, setLikeCount] = useState(
+    blogData ? blogData.like_count : 0
+  );
 
+  useEffect(() => {
+    if (blogData) {
+      setLikeCount(blogData.like_count);
+    }
+  }, [blogData]);
+
+  const route = useRoute();
   const navigation = useNavigation();
+
   const apiUrl = "https://api.ballog.store";
-  const post_id = 82;
+  const { post_id } = route.params;
 
   useEffect(() => {
     console.log(`Fetching data from ${apiUrl}/board/post/${post_id}`);
@@ -86,6 +97,10 @@ const CheckBlog = () => {
     setShowButtons((prev) => !prev);
   };
 
+  const handleLikeCount = () => {
+    setLikeCount((prevLikeCount) => prevLikeCount + 1);
+  };
+
   const handleDeletePress = () => {
     Alert.alert(
       "삭제 확인",
@@ -93,10 +108,49 @@ const CheckBlog = () => {
       [
         {
           text: "취소",
-          onPress: () => console.log("Cancel Pressed"),
+          onPress: () => console.log("삭제 취소"),
           style: "cancel",
         },
-        { text: "삭제", onPress: () => console.log("OK Pressed") },
+        {
+          text: "삭제",
+          onPress: () => {
+            console.log("삭제 요청 전송");
+
+            axios
+              .delete(`${apiUrl}/board/post/${post_id}`, {
+                headers: {
+                  Authorization: `Bearer ${API_TOKEN}`,
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                },
+              })
+              .then((response) => {
+                console.log("삭제 성공:", response.status);
+                console.log("삭제 응답 데이터:", response.data);
+
+                if (response.status === 200 || response.status === 204) {
+                  // 서버에서 삭제 성공 응답이 반환되었는지 확인
+                  Alert.alert("성공", "게시글이 삭제되었습니다.");
+                  navigation.goBack(); // 삭제 후 이전 화면으로 돌아가기
+                } else {
+                  Alert.alert("오류", "게시글 삭제에 실패했습니다.");
+                }
+              })
+              .catch((error) => {
+                if (error.response) {
+                  console.error("삭제 에러 응답 상태:", error.response.status);
+                  console.error("삭제 에러 응답 데이터:", error.response.data);
+                  Alert.alert("오류", "게시글 삭제에 실패했습니다.");
+                } else if (error.request) {
+                  console.error("삭제 에러 요청:", error.request);
+                  Alert.alert("오류", "서버와 연결할 수 없습니다.");
+                } else {
+                  console.error("삭제 에러 메시지:", error.message);
+                  Alert.alert("오류", "알 수 없는 오류가 발생했습니다.");
+                }
+              });
+          },
+        },
       ],
       { cancelable: false }
     );
@@ -104,8 +158,13 @@ const CheckBlog = () => {
 
   // ContentImage의 source 속성 값 결정
   const getContentImages = () => {
-    if (blogData && blogData.img_urls && blogData.img_urls.length > 0) {
-      return blogData.img_urls.map((url, index) => (
+    if (
+      blogData &&
+      blogData.img_urls &&
+      blogData.img_urls.imgUrls &&
+      blogData.img_urls.imgUrls.length > 0
+    ) {
+      return blogData.img_urls.imgUrls.map((url, index) => (
         <ContentImage key={index} source={{ uri: url }} />
       ));
     }
@@ -194,10 +253,10 @@ const CheckBlog = () => {
 
       <PostFooter>
         <IconWrapper>
-          <LikeIcon>
+          <LikeIcon onPress={handleLikeCount}>
             <AntDesign name="hearto" size={21} color="#E05936" />
           </LikeIcon>
-          <LikeCount>{blogData ? blogData.like_count : "Loading..."}</LikeCount>
+          <LikeCount>{likeCount}</LikeCount>
           <ChatIcon onPress={() => navigation.navigate("Comment", { post_id })}>
             <MaterialCommunityIcons
               name="message-reply-outline"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components/native";
 import {
   TouchableWithoutFeedback,
@@ -6,7 +6,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Ionicons,
   MaterialCommunityIcons,
@@ -14,10 +14,19 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 import { colors, fonts } from "../global";
+import axios from "axios";
+import { API_TOKEN } from "@env";
 
 const CheckMVP = () => {
   const [showButtons, setShowButtons] = useState(false);
+  const [mvpData, setMvpData] = useState(null);
+
   const navigation = useNavigation();
+
+  const route = useRoute();
+
+  const apiUrl = "https://api.ballog.store";
+  const { post_id_mvp } = route.params;
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -42,6 +51,41 @@ const CheckMVP = () => {
       { cancelable: false }
     );
   };
+
+  useEffect(() => {
+    console.log(`Fetching data from ${apiUrl}/board/post/${post_id_mvp}`);
+    console.log("API_TOKEN:", API_TOKEN);
+    axios
+      .get(`${apiUrl}/board/post/${post_id_mvp}`, {
+        headers: {
+          Authorization: `Bearer ${API_TOKEN}`,
+          "Content-Type": "application/json",
+          Accept: "application/json", // Ensure server responds with JSON
+        },
+      })
+      .then((response) => {
+        console.log("API Response Status:", response.status);
+        console.log("API Response Headers:", response.headers);
+        console.log("API Response Data:", response.data);
+        setMvpData(response.data.result); // Save response data to state
+      })
+      .catch((error) => {
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error("API Error Response Status:", error.response.status);
+          console.error("API Error Response Headers:", error.response.headers);
+          console.error("API Error Response Data:", error.response.data);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.error("API Error Request:", error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.error("API Error Message:", error.message);
+        }
+        console.error("API Error Config:", error.config);
+      });
+  }, [post_id_mvp]);
 
   return (
     <Wrapper>
@@ -229,7 +273,6 @@ const UserType = styled.Text`
   font-size: ${fonts.sizes.small};
   font-weight: ${fonts.weights.bold};
 `;
-
 
 const DateTime = styled.Text`
   color: #aaaaaa;

@@ -1,10 +1,13 @@
+import { API_TOKEN } from "@env";
+
 export const getPresignedUrl = async (fileName, fileLocation, fileType) => {
   // S3 프리사인드 URL을 요청하는 함수
   try {
+    console.log("API_TOKEN:", API_TOKEN);
     const response = await fetch("https://api.ballog.store/api-utils/s3", {
       method: "POST",
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MSIsImlhdCI6MTcyNDM5NzY1NywiZXhwIjoxNzI0NDA0ODU3fQ.YFJhuPnXrXk-VTMtLeAioJPg-B2e6vtXwLiHd51uWEk `, // 실제 액세스 토큰, 현재는 스웨거에서 발급받은 임시 토큰
+        Authorization: `Bearer ${API_TOKEN}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

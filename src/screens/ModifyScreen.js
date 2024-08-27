@@ -6,11 +6,15 @@ import { AntDesign } from "@expo/vector-icons";
 import BlogScreen from "./ModifyBlog"; // BlogScreen을 별도 파일로 분리
 import MvpScreen from "./ModifyMvp"; // MvpScreen을 별도 파일로 분리
 import { TouchableWithoutFeedback, Keyboard, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const ModifyScreen = () => {
   const [selectedValue, setSelectedValue] = useState("blog");
   const navigation = useNavigation();
+
+  const route = useRoute();
+
+  const { post_id } = route.params;
 
   const handleBackPress = () => {
     navigation.goBack();
