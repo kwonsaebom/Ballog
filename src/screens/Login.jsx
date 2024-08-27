@@ -3,37 +3,51 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, Modal, B
 import { colors } from '../global';
 import { WebView } from 'react-native-webview'; // WebView import
 import { useNavigation } from '@react-navigation/native';
+import { store } from '../utils/secureStore'
+
 import axios from 'axios';
 
 const Login = () => {
-  let code;
+
+  const customUserAgent = 'customUserAgent';
   const [modalVisible, setModalVisible] = useState(false);
   const [modalUrl, setModalUrl] = useState(null);
+  const [redirectUrl, setRedirectUrl] = useState(null);
   const navigation = useNavigation(); // Initialize navigation
+  
   const onPressHandler = () => {
-    navigation.navigate('ProfileImage'); // Navigate to LoginPage
-};
+    navigation.navigate('ProfileImage')
+  };
+
+  async function saveToken(key, value) {
+    await SecureStore.setItemAsync(key, value);
+  }
+
   const fetchData = async (url) => {
     try {
       const response = await axios.get(url);
       const data = response.data;
-      const headers = response.headers;
-      console.log('Response Headers:', headers);
+      const accesstoken = response.headers.authorization;
+      const refreshtoken = response.headers.refreshtoken;
+      const user_id = response.headers.user_id;
+      store.save('Authorization', authorization);
+      store.save('refreshtoken', refreshtoken);
+      store.save('user_id', user_id);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  };
-  
+  };  
+
   const handleNavigationStateChange = (navState) => {
     const url = navState.url;
-    const targetString = modalUrl;
-    if (url.includes(targetString+'/redirect') && !url.includes('oauth')) {
-      code = url.split('?')[1]
-      const redirect_url = modalUrl + '/token?' + code
-      fetchData(redirect_url);
-      setModalVisible(false);
-      onPressHandler()
-    }    
+    if (url !== redirectUrl && url.includes('redirect') && !url.includes('oauth')) {
+      setRedirectUrl(url);
+      const code = url.split('?')[1]
+      const token_url = modalUrl + '/token?' + code
+      fetchData(token_url)
+    }
+    setModalVisible(false);
+    onPressHandler()
   };
 
   return (
@@ -48,7 +62,7 @@ const Login = () => {
       </View>
       <TouchableOpacity style={styles.button} onPress={() => {
             setModalVisible(true)
-            setModalUrl('http://192.168.1.7:3000/auth/login/google')
+            setModalUrl('https://api.ballog.store/auth/login/google')
           }
         }>
         <View style={styles.imageContainer}>
@@ -58,7 +72,7 @@ const Login = () => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => {
             setModalVisible(true)
-            setModalUrl('http://192.168.1.7:3000/auth/login/naver')
+            setModalUrl('https://api.ballog.store/auth/login/naver')
           }
         }>
         <View style={styles.imageContainer}>
@@ -68,7 +82,7 @@ const Login = () => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => {
             setModalVisible(true)
-            setModalUrl('http://192.168.1.7:3000/auth/login/kakao')
+            setModalUrl('https://api.ballog.store/auth/login/kakao')
           }
         }>
         <View style={styles.imageContainer}>
@@ -87,6 +101,7 @@ const Login = () => {
         <View style={styles.modalContainer}>
           <WebView
             source={{ uri: modalUrl }}
+            userAgent={customUserAgent}
             onNavigationStateChange={handleNavigationStateChange}
             style={styles.webView}
           />
