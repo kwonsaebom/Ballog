@@ -12,7 +12,7 @@ import { Ionicons, AntDesign, MaterialCommunityIcons, Feather } from '@expo/vect
 export default function ComuPostedScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const {updateLikes, getPostById, deletePost} = useContext(PostsContext);
+  const {toggleLike, getPostById, deletePost} = useContext(PostsContext);
   const {comments, addComment, addReply, getTotalCommentCount} = useContext(CommentsContext);
   const {postId, category} = route.params || {};
   const [selectedCategory, setSelectedCategory] = useState(category);
@@ -29,11 +29,10 @@ export default function ComuPostedScreen() {
   const postComments = comments[postId] || [];
 
   const userCircleColors = useMemo(() => {
-    const colors = {};
-    postComments.forEach(comment => {
+    return postComments.reduce((colors, comment) => {
       colors[comment.id] = getRandomPastelColor();
-    });
-    return colors;
+      return colors;
+    }, {});
   }, [postComments]);
 
   const inputRef = useRef(null);
@@ -161,12 +160,12 @@ export default function ComuPostedScreen() {
           </ImageWrapper>
           <PostFooter>
             <IconWrapper>
-              <LikeIcon onPress={() => updateLikes(postId)}>
-                    <AntDesign name="hearto" size={12} color="#E05936" />
+              <LikeIcon onPress={() => toggleLike(postId)}>
+                <AntDesign name={post.has_liked ? "heart" : "hearto"} size={12} color="#E05936" />
               </LikeIcon>
               <LikeCount>{post.likes}</LikeCount>
               <ChatIcon>
-                    <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
+                <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
               </ChatIcon>
               <ChatCount>{totalCommentCount}</ChatCount>
             </IconWrapper>
@@ -189,9 +188,9 @@ export default function ComuPostedScreen() {
               <UserInfo>
                 <UserNameWrapper>
                   <UserCircle color={userCircleColors[comment.id]}>
-                    <UserFirstName>{userName.slice(1)}</UserFirstName>
+                    <UserFirstName>{comment.username.slice(1)}</UserFirstName>
                   </UserCircle>
-                  <UserName>{userName}</UserName>
+                  <UserName>{comment.username}</UserName>
                 </UserNameWrapper>
               </UserInfo>
               <DetailTimeWrapper>
@@ -235,7 +234,7 @@ export default function ComuPostedScreen() {
       <CommentsFooter>
         <InputBoxWrapper>
           <UserCircle2 color={getRandomPastelColor()}>
-            <UserFirstName>길동</UserFirstName>
+            <UserFirstName>{post.author_name.slice(1)}</UserFirstName>
           </UserCircle2>
           {replyToCommentId ? (
             <ReplyInputBox 

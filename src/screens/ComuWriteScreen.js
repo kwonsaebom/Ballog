@@ -15,7 +15,7 @@ export default function ComuWriteScreen() {
   const postId = route.params?.postId;
   const existingPost = postId ? getPostById(postId) : null;
 
-  const [posts, setPosts] = useState({
+  const [posts, setPosts] = useState(() => ({
     id: Date.now().toString(), // 임시로 랜덤 ID 생성
     title: '',
     detail: '',
@@ -26,15 +26,15 @@ export default function ComuWriteScreen() {
     comments: 0,
     images: [],
     category: category,
-  });
+  }));
 
   const { title, detail, images } = posts;
 
   useEffect(() => {
-    if (postId && existingPost) {
+    if (postId) {
       setPosts(existingPost);
     }
-  }, [postId, existingPost]);
+  }, [postId]);
 
   const onChange = (name, value) => {
     setPosts({
@@ -44,10 +44,14 @@ export default function ComuWriteScreen() {
   };
 
   const handleRegister = () => {
-    if (posts.title.trim() === '' || posts.detail.trim() === '') {
-        alert('내용을 입력해주세요.');
+    if (posts.title.trim() === '') {
+        alert('제목을 입력하세요.');
         return;
-    }
+      }
+      if (posts.detail.trim() === '') {
+        alert('내용을 입력하세요.');
+        return;
+      }
 
     if (existingPost) {
         updatePost(posts);
@@ -55,11 +59,13 @@ export default function ComuWriteScreen() {
         addPost(posts); // 새로운 게시글을 Context에 추가
     }
     
-    navigation.navigate('ComuPostedScreen', {
-        postId: posts.id, 
-        category: posts.category,
-    });
-  };
+    navigation.navigate('MainTabs', {
+        screen: '커뮤니티',
+        params: {
+            postId: posts.id, 
+            category: posts.category},
+        });
+    };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({

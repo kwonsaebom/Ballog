@@ -11,8 +11,8 @@ export default function CommunityScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState('league');
 
   const filteredPosts = selectedCategory === 'league'
-   ? posts.filter(post => post.category === 'league') || []
-    : posts.filter(post => post.category === 'myteam') || [];
+   ? posts.filter(post => post.category === 'league')
+    : posts.filter(post => post.category === 'team');
 
   return (
     <Wrapper>
@@ -26,11 +26,11 @@ export default function CommunityScreen({ navigation }) {
             <TextWrapper1 isActive={selectedCategory === 'league'} />
           </CtgyButton>
           <CtgyButton 
-          onPress={() => {setSelectedCategory('myteam')}}
-          isActive={selectedCategory === 'myteam'}
+          onPress={() => {setSelectedCategory('team')}}
+          isActive={selectedCategory === 'team'}
           >
             <CtgyText>마이팀 커뮤니티</CtgyText>
-            <TextWrapper2 isActive={selectedCategory === 'myteam'} />
+            <TextWrapper2 isActive={selectedCategory === 'team'} />
           </CtgyButton>
         </CtgyWrapper>
         <InputBoxWrapper>
