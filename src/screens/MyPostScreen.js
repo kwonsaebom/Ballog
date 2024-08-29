@@ -1,22 +1,8 @@
 // MyPost.js
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Modal,
-  Pressable,
-  TouchableWithoutFeedback,
-} from "react-native";
+import {View, Text, StyleSheet, TouchableOpacity, Image, Modal, Pressable, TouchableWithoutFeedback,} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {
-  Ionicons,
-  AntDesign,
-  MaterialCommunityIcons,
-  Feather,
-} from "@expo/vector-icons";
+import { Ionicons, AntDesign, MaterialCommunityIcons, Feather, } from "@expo/vector-icons";
 import ModalComponent from "../components/Modal";
 
 const MyPostScreen = () => {
