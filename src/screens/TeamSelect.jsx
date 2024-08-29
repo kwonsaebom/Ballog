@@ -13,8 +13,8 @@ const TeamSelect = () => {
     // 데이터를 가져오는 함수
     const fetchData = async () => {
       try {
-        const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MiIsImlhdCI6MTcyNDkzNzE2NiwiZXhwIjoxNzMwMTIxMTY2fQ.r29UK6qbIj8__WSif36FP1u6zpIrcMyAeVH-DhiIgVo';
-
+        const accessToken = '~';
+        // 토큰 Bearer을 제외한 부분 넣어야함
         const response = await axios.get('https://api.ballog.store/myPage/setting/teamSetting', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
