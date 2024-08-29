@@ -3,71 +3,65 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; 
-import axios from 'axios'; 
+import { getPresignedUrl, uploadFileToS3 } from '../components/S3';
 
 const useCommonNavigation = () => {
     const navigation = useNavigation();
   
     const navigateTo = (screenName) => {
-      navigation.navigate(screenName);
+        navigation.navigate(screenName);
     };
 
     const navigateBack = () => {
         navigation.goBack();
-      };
+    };
   
     return {
-      navigateTo,
-      navigateBack,
+        navigateTo,
+        navigateBack,
     };
-  };
+};
 
 const SettingScreen = () => {
-
     const { navigateTo, navigateBack } = useCommonNavigation();
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [image, setImage] = useState(null);
 
-    // 갤러리에서 이미지 선택 함수
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    const pickImage = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (permissionResult.granted === false) {
+            alert('카메라 접근 권한이 필요');
+            return;
+        }
 
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri); // 선택된 이미지 URI 저장
-      patchImageToServer(result.assets[0].uri); // 이미지 서버로 전송
-    }
-  };
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
 
-  // 선택된 이미지를 서버로 PATCH 요청
-  const patchImageToServer = async (imageUri) => {
-    const formData = new FormData();
-    formData.append('profileImage', {
-      uri: imageUri,
-      name: 'profile.jpg',
-      type: 'image/jpeg',
-    });
+        if (!result.canceled) {
+            const selectedImageUri = result.assets[0].uri;
+            setImage(selectedImageUri);
 
-    try {
-        const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MiIsImlhdCI6MTcyMzQwMjM2OSwiZXhwIjoxNzIzNDA5NTY5fQ.TytMNQouqNsLOUcYXuK5uSOY8Xo8KAFsbUhy5Fjo_d8 ';
+            try {
+                const fileName = selectedImageUri.split('/').pop();
+                const fileType = `image/${fileName.split('.').pop()}`;
 
-      const response = await axios.patch('https://api.ballog.store/myPage/setting/backgroundImg', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      if (response.status === 200) {
-        Alert.alert('성공', '프로필 이미지가 업데이트되었습니다.');
-      }
-    } catch (error) {
-      console.error('이미지 업로드 오류:', error);
-      Alert.alert('오류', '이미지 업로드 중 오류가 발생했습니다.');
-    }
-  };
+                const presignedUrl = await getPresignedUrl(fileName, 'background', fileType);
+
+                const response = await fetch(selectedImageUri);
+                const blob = await response.blob();
+
+                await uploadFileToS3(presignedUrl, blob);
+
+                alert('이미지 업로드 성공');
+            } catch (error) {
+                console.error('이미지 업로드 중 오류 발생:', error);
+                alert('이미지 업로드 실패');
+            } 
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -88,11 +82,11 @@ const SettingScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={pickImage}>
                 <Text style={styles.MainText}>프로필 배경</Text>
-                {selectedImage ? (
-                    <Image style={styles.BackImage} source={{ uri: selectedImage }} />
-                    ) : (
-                     <Image style={styles.BackImage} source={require('../assets/basic.png')} />
-                    )}
+                {image ? (
+                    <Image source={{ uri: image }} style={styles.image} />
+                ) : (
+                    <Image style={styles.BackImage} source={require('../assets/basic.png')} />
+                )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => navigateTo('TeamSelect')}>
                 <View style={styles.texts}>
@@ -157,7 +151,7 @@ const styles = StyleSheet.create({
         width: 57,
         height: 57,
     },
-    BackImage:{
+    BackImage: {
         width: 84,
         height: 71,
         borderRadius: 10,
@@ -165,6 +159,11 @@ const styles = StyleSheet.create({
     TeamImage: {
         width: 51,
         height: 71,
+    },
+    image: {
+        width: 84,
+        height: 71,
+        borderRadius: 10,
     },
 });
 

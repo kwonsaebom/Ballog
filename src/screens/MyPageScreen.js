@@ -14,12 +14,16 @@ const MyPageScreen = () => {
   const selectedTeam = route.params?.team;
   const [data, setData] = useState(null); // 데이터 상태
 
+  const backgroundImage = data?.opposition_icon_flag
+        ? { uri: data.user_background_img }
+        : require('../assets/basic.png'); // 기본 이미지
+
   useEffect(() => {
     // 데이터를 가져오는 함수
     const fetchData = async () => {
       try {
-        const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MiIsImlhdCI6MTcyNDkzNzE2NiwiZXhwIjoxNzMwMTIxMTY2fQ.r29UK6qbIj8__WSif36FP1u6zpIrcMyAeVH-DhiIgVo';
-
+        const accessToken = '~';
+        // 토큰 Bearer을 제외한 부분 넣어야함
         const response = await axios.get('https://api.ballog.store/myPage', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -67,7 +71,7 @@ const MyPageScreen = () => {
     } 
   };
 
-  // Example red dates
+  
   const redDates = data && data.writed_date_list ? data.writed_date_list : [];
   console.log('Fetched redDates:', redDates);
   const today = new Date().toISOString().split('T')[0];
@@ -87,7 +91,7 @@ const MyPageScreen = () => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../assets/basic.png')}
+        source={backgroundImage}
         style={styles.BasicImage}
       >
         {selectedTeam && (
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     margin: 10,
     position: 'absolute',
-    right: 10, // Adjust based on your requirement
+    right: 10, 
     top: 20,
   },
   SettingImageButton: {
