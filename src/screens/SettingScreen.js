@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker'; 
+import axios from 'axios'; 
 
 const useCommonNavigation = () => {
     const navigation = useNavigation();
@@ -23,6 +25,49 @@ const useCommonNavigation = () => {
 const SettingScreen = () => {
 
     const { navigateTo, navigateBack } = useCommonNavigation();
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    // 갤러리에서 이미지 선택 함수
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri); // 선택된 이미지 URI 저장
+      patchImageToServer(result.assets[0].uri); // 이미지 서버로 전송
+    }
+  };
+
+  // 선택된 이미지를 서버로 PATCH 요청
+  const patchImageToServer = async (imageUri) => {
+    const formData = new FormData();
+    formData.append('profileImage', {
+      uri: imageUri,
+      name: 'profile.jpg',
+      type: 'image/jpeg',
+    });
+
+    try {
+        const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MiIsImlhdCI6MTcyMzQwMjM2OSwiZXhwIjoxNzIzNDA5NTY5fQ.TytMNQouqNsLOUcYXuK5uSOY8Xo8KAFsbUhy5Fjo_d8 ';
+
+      const response = await axios.patch('https://api.ballog.store/myPage/setting/backgroundImg', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (response.status === 200) {
+        Alert.alert('성공', '프로필 이미지가 업데이트되었습니다.');
+      }
+    } catch (error) {
+      console.error('이미지 업로드 오류:', error);
+      Alert.alert('오류', '이미지 업로드 중 오류가 발생했습니다.');
+    }
+  };
 
     return (
         <View style={styles.container}>
@@ -41,9 +86,13 @@ const SettingScreen = () => {
                 </View>
                 <Image style={styles.ProfileImage} source={require('../assets/Profile.png')} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigateTo('LogoutScreen')}>
+            <TouchableOpacity style={styles.button} onPress={pickImage}>
                 <Text style={styles.MainText}>프로필 배경</Text>
-                <Image style={styles.BackImage} source={require('../assets/basic.png')} />
+                {selectedImage ? (
+                    <Image style={styles.BackImage} source={{ uri: selectedImage }} />
+                    ) : (
+                     <Image style={styles.BackImage} source={require('../assets/basic.png')} />
+                    )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => navigateTo('TeamSelect')}>
                 <View style={styles.texts}>
