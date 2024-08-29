@@ -16,7 +16,7 @@ const MyPageScreen = () => {
     const selectedDate = day.dateString;
     const isRedDate = redDates.includes(selectedDate);
     if (isRedDate) {
-      navigation.navigate('MyPostScreen');
+      navigation.navigate('MyPostScreen'); 
     } 
   };
 
