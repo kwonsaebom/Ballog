@@ -116,7 +116,7 @@ const MyPageScreen = () => {
             <View style={styles.imageContainer}>
               <Image
                 style={styles.ProfileImage}
-                source={require("../assets/Profile.png")}
+                source={require(data.)}
               />
             </View>
             <Text style={styles.buttonText}>{data.user_name}</Text>
