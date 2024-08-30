@@ -11,7 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#C51E3A",
       "imageStyle": {
-        "width": 100, 
+        "width": 100,
         "height": 100
       }
     },
@@ -26,6 +26,9 @@
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
