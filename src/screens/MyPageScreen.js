@@ -1,5 +1,4 @@
-// MyPageScreen.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,10 +9,60 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import axios from "axios";
 
 const MyPageScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
+  const selectedTeam = route.params?.team;
+  const [data, setData] = useState(null); // 데이터 상태
+
+  const backgroundImage = data?.opposition_icon_flag
+    ? { uri: data.user_background_img }
+    : require("../assets/basic.png"); // 기본 이미지
+
+  useEffect(() => {
+    // 데이터를 가져오는 함수
+    const fetchData = async () => {
+      try {
+        const accessToken = "~";
+        // 토큰 Bearer을 제외한 부분 넣어야함
+        const response = await axios.get("https://api.ballog.store/myPage", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }); // 실제 API 엔드포인트로 교체
+
+        setData(response.data.result); // 데이터 설정
+        console.log("Fetched data:", response.data.result);
+      } catch (error) {
+        if (error.response) {
+          // 서버가 응답을 반환한 경우 (상태 코드가 2xx 범위 밖인 경우)
+          console.error("Error fetching data:", error.response.data);
+          console.error("Status code:", error.response.status);
+          console.error("Headers:", error.response.headers);
+        } else if (error.request) {
+          // 요청이 전송되었으나 응답을 받지 못한 경우
+          console.error("Error request:", error.request);
+        } else {
+          // 요청을 설정하는 동안 발생한 다른 오류
+          console.error("Error message:", error.message);
+        }
+        console.error("Error config:", error.config);
+      }
+    };
+
+    fetchData(); // 컴포넌트 마운트 시 데이터 가져오기
+  }, []);
+
+  const formatMatchDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1; // 월 (0-11이므로 +1)
+    const day = date.getDate(); // 일
+    return `${month}/${day}일 경기`;
+  };
 
   const onPressHandler = () => {
     navigation.navigate("SettingScreen");
@@ -21,45 +70,40 @@ const MyPageScreen = () => {
 
   const onDayPress = (day) => {
     const selectedDate = day.dateString;
-    const isRedDate = redDates.includes(selectedDate);
+    const isRedDate =
+      markedDates[selectedDate] &&
+      markedDates[selectedDate].selectedColor === "#E8A5B0";
     if (isRedDate) {
       navigation.navigate("MyPostScreen");
     }
   };
 
-  const redDateStyle = {
-    customStyles: {
-      container: {
-        backgroundColor: "#E8A5B0", // 빨간색 배경
-      },
-      text: {
-        color: "black", // 검정색 글씨
-      },
-    },
-  };
-
-  // Example red dates
-  const redDates = ["2024-08-01", "2024-08-15", "2024-08-20"];
+  const redDates = data && data.writed_date_list ? data.writed_date_list : [];
+  console.log("Fetched redDates:", redDates);
   const today = new Date().toISOString().split("T")[0];
 
   const markedDates = redDates.reduce((acc, date) => {
-    acc[date] = { selected: true, selectedColor: "#E8A5B0" };
+    const formattedDate = new Date(date).toISOString().split("T")[0]; // 날짜 형식을 YYYY-MM-DD로 변환
+    acc[formattedDate] = {
+      selected: true,
+      selectedColor: "#E8A5B0",
+    };
     return acc;
   }, {});
+  console.log("Fetched markDates:", markedDates);
 
   markedDates[today] = { selected: true, selectedColor: "#CDCDCD" };
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../assets/basic.png")}
-        style={styles.BasicImage}
-      >
-        <Image
-          style={styles.TeamImage}
-          source={require("../assets/Teams/Doosan.png")}
-        />
-        <TouchableOpacity onPress={onPressHandler}>
+      <ImageBackground source={backgroundImage} style={styles.BasicImage}>
+        {selectedTeam && (
+          <Image style={styles.TeamImage} source={selectedTeam.image} />
+        )}
+        <TouchableOpacity
+          style={styles.SettingImageButton}
+          onPress={onPressHandler}
+        >
           <Image
             style={styles.SettingImage}
             source={require("../assets/Setting.png")}
@@ -86,19 +130,35 @@ const MyPageScreen = () => {
       <View style={styles.ScoreContainer}>
         <View style={styles.ScoreResult}>
           <View style={styles.ScoreDate}>
-            <Text style={styles.Date}>6/27일 경기</Text>
+            <Text style={styles.Date}>{formatMatchDate(today)}</Text>
           </View>
-          <Text style={styles.Result}>승</Text>
+          <Text style={styles.Result}>
+            {data?.user_team_score === null && data?.opposition_score === null
+              ? " " // 두 값이 모두 null인 경우 빈 문자열을 출력
+              : data?.user_team_score > data?.opposition_score
+              ? "승"
+              : "패"}
+          </Text>
         </View>
         <View style={styles.Score}>
           <Image
             style={styles.ScoreImage}
-            source={require("../assets/Teams/Doosan.png")}
-          ></Image>
-          <Text style={styles.ScoreNum}>5 : 3</Text>
+            source={{ uri: data?.opposition_icon_flag }}
+          >
+            {/* user_team_icon_flag로 수정 필요, 데이터 부족 */}
+          </Image>
+          {data &&
+          data.user_team_score !== null &&
+          data.opposition_score !== null ? (
+            <Text style={styles.ScoreNum}>
+              {data.user_team_score} : {data.opposition_score}
+            </Text>
+          ) : (
+            <Text style={styles.ScoreNone}>오늘의 경기는 없습니다</Text>
+          )}
           <Image
             style={styles.ScoreImage}
-            source={require("../assets/Teams/LG.png")}
+            source={{ uri: data?.opposition_icon_flag }}
           ></Image>
         </View>
       </View>
@@ -149,20 +209,24 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   TeamImage: {
-    width: 85,
-    height: 85,
-    borderRadius: 100,
+    width: 62,
+    height: 75,
+    borderRadius: 1,
     margin: 10,
     position: "absolute",
-    right: 10, // Adjust based on your requirement
-    Top: 20,
+    right: 10,
+    top: 20,
   },
-  SettingImage: {
+  SettingImageButton: {
     height: 27,
     width: 27,
     marginTop: 220,
     marginLeft: 20,
     marginBottom: 10,
+  },
+  SettingImage: {
+    height: 27,
+    width: 27,
   },
   buttonGroup: {
     flexDirection: "row",
@@ -243,6 +307,10 @@ const styles = StyleSheet.create({
   ScoreNum: {
     fontSize: 26,
     fontWeight: "800",
+  },
+  ScoreNone: {
+    fontSize: 15,
+    fontWeight: "600",
   },
   calendarContainer: {
     flex: 1,
