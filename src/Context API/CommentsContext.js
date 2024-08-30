@@ -1,9 +1,10 @@
+//CommentContext.js
 import React, { createContext, useState } from 'react';
 
 export const CommentsContext = createContext();
 
 export const CommentsProvider = ({ children }) => {
-  const [comments, setComments] = useState({});
+  const [comments, setComments] = useState(() => ({}));
 
   const addComment = (postId, newComment) => {
     setComments(prevComments => {

@@ -31,26 +31,25 @@ const Login = () => {
       const refreshtoken = response.headers.refreshtoken;
       const user_id = response.headers.user_id;
       console.log(Authorization, refreshtoken, user_id, "헤더")
-      store.save('Authorization', Authorization);
-      store.save('refreshtoken', refreshtoken);
-      store.save('user_id', user_id);
+      await store.save('Authorization', Authorization);
+      await store.save('refreshtoken', refreshtoken);
+      await store.save('user_id', user_id);
       getSocket(user_id)
+      onPressHandler()
     } catch (error) {
-      console.error('Error fetching data:', error, "여기야?");
+      console.error('Error fetching data:', error, "여기야?????");
     }
   };  
 
   const handleNavigationStateChange = (navState) => {
     const url = navState.url;
-    console.log(url, "test1")
     if (url !== redirectUrl && url.includes('redirect') && !url.includes('oauth')) {
-      console.log(url, "test2")
       setRedirectUrl(url);
       const code = url.split('?')[1]
       const token_url = modalUrl + '/token?' + code
       fetchData(token_url)
       setModalVisible(false)
-      onPressHandler()
+      
     }
     //setModalVisible(false);
     
@@ -66,6 +65,36 @@ const Login = () => {
       <View style={styles.container}>
         <Text style={styles.text}>안녕하세요,{'\n'}회원가입을 환영합니다</Text>
       </View>
+      <TouchableOpacity style={styles.button} onPress={() => {
+            setModalVisible(true)
+            setModalUrl('https://api.ballog.store/auth/signUp/google')
+          }
+        }>
+        <View style={styles.imageContainer}>
+          <Image style={styles.image} source={require('../assets/Google.png')} />
+        </View>
+        <Text style={styles.buttonText}>구글로 회원가입</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => {
+            setModalVisible(true)
+            setModalUrl('https://api.ballog.store/auth/signUp/naver')
+          }
+        }>
+        <View style={styles.imageContainer}>
+          <Image style={styles.image} source={require('../assets/Google.png')} />
+        </View>
+        <Text style={styles.buttonText}>네이버로 회원가입</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => {
+            setModalVisible(true)
+            setModalUrl('https://api.ballog.store/auth/signUp/kakao')
+          }
+        }>
+        <View style={styles.imageContainer}>
+          <Image style={styles.image} source={require('../assets/Google.png')} />
+        </View>
+        <Text style={styles.buttonText}>카카오로 회원가입</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => {
             setModalVisible(true)
             setModalUrl('https://api.ballog.store/auth/login/google')
@@ -96,6 +125,8 @@ const Login = () => {
         </View>
         <Text style={styles.buttonText}>카카오로 계속하기</Text>
       </TouchableOpacity>
+      
+      
 
       {/* 카카오 로그인 모달 */}
       <Modal

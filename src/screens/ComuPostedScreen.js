@@ -1,5 +1,5 @@
 //ComuPostedScreen.js
-import React, {useState, useContext, useMemo, useRef} from 'react';
+import React, {useState, useContext, useMemo, useRef, useEffect} from 'react';
 import { Keyboard } from 'react-native';
 import styled from 'styled-components/native';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -12,15 +12,24 @@ import { Ionicons, AntDesign, MaterialCommunityIcons, Feather } from '@expo/vect
 export default function ComuPostedScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const {updateLikes, getPostById, deletePost} = useContext(PostsContext);
+  const {toggleLike, getPostById, deletePost} = useContext(PostsContext);
   const {comments, addComment, addReply, getTotalCommentCount} = useContext(CommentsContext);
-  const {postId, category} = route.params || {};
+  
+  const {postId, category, postData} = route.params || {};
+  const post = postData || {
+    postId: '',
+    title: '',
+    content: '',
+    date: '',
+    time: '',
+    user_name: '사용자',
+    like_count: 0,
+    imageUrls: []
+  };
+
   const [selectedCategory, setSelectedCategory] = useState(category);
-  const [userName, setUserName] = useState('익명');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
-
-  const post = getPostById(postId);
 
   const [inputValue, setInputValue] = useState('');
   const [replyInputValue, setReplyInputValue] = useState('');
@@ -29,11 +38,10 @@ export default function ComuPostedScreen() {
   const postComments = comments[postId] || [];
 
   const userCircleColors = useMemo(() => {
-    const colors = {};
-    postComments.forEach(comment => {
+    return postComments.reduce((colors, comment) => {
       colors[comment.id] = getRandomPastelColor();
-    });
-    return colors;
+      return colors;
+    }, {});
   }, [postComments]);
 
   const inputRef = useRef(null);
@@ -41,16 +49,25 @@ export default function ComuPostedScreen() {
   const handleBackPress = () => {
     navigation.navigate("MainTabs", {
       screen: '커뮤니티',
-      params: { category }
+      params: { type: post.type, updatedPost: post }
     });
   };
+
+  const handleToggleLike = async () => {
+    try {
+      // 게시글의 ID를 기반으로 좋아요 상태를 토글
+      await toggleLike(post.postId);
+  } catch (error) {
+      console.error('좋아요 상태를 변경하는 중 오류 발생:', error);
+  }
+  }
 
   const handleCommentSubmit = () => {
     if (inputValue.trim() === '') return;
 
     const newComment = {
       id: Date.now().toString(),
-      username: userName,
+      username: post.user_name,
       detail: inputValue,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
@@ -66,7 +83,7 @@ export default function ComuPostedScreen() {
 
     const newReply = {
       id: Date.now().toString(),
-      username: userName,
+      username: post.user_name,
       detail: replyInputValue,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -79,16 +96,16 @@ export default function ComuPostedScreen() {
 
   const handleEditPress = () => {
     navigation.navigate('ComuWriteScreen', {
-      postId: post.id,
-      category: post.category,
+      postId: post.postId,
+      type: post.type,
     });
   };
 
-  const handleDeletePress = () => {
-    deletePost(postId);
+  const handleDeletePress = async () => {
+    await deletePost(postId);
     navigation.navigate("MainTabs", {
       screen: '커뮤니티',
-      params: {category}
+      params: {type}
     });
   };
 
@@ -131,9 +148,9 @@ export default function ComuPostedScreen() {
           <WriterInfoBox>
             <WriterNameWrapper>
                 <WriterCircle>
-                  <FirstName>{post.author_name.slice(1)}</FirstName>
+                  <FirstName>{post.user_name ? post.user_name.slice(1) : ''}</FirstName>
                 </WriterCircle>
-                <WriterName>{post.author_name}</WriterName>
+                <WriterName>{post.user_name || '사용자'}</WriterName>
             </WriterNameWrapper>
             <DateTime>{`${post.date} | ${post.time}`}</DateTime>
           </WriterInfoBox>
@@ -142,31 +159,31 @@ export default function ComuPostedScreen() {
               <PostTitleText>{post.title}</PostTitleText>
             </PostTitle>
             <PostDetail>
-              <PostDetailText>{post.detail}</PostDetailText>
+              <PostDetailText>{post.content}</PostDetailText>
             </PostDetail>
           </PostContents>
           <ImageWrapper 
             horizontal 
-            hasImages={post.images.length > 0}
+            hasImages={post.imageUrls.length > 0}
             showsHorizontalScrollIndicator={false}
           >
-          {post.images.map((imageUri, index) => (
+          {post.imageUrls.map((imageUri, index) => (
             <PostImage 
               key={`${imageUri}-${index}`} 
               source={{uri: imageUri}} 
               isFirst={index === 0}
-              isLast={index === post.images.length - 1}
+              isLast={index === post.imageUrls.length - 1}
             />
           ))}
           </ImageWrapper>
           <PostFooter>
             <IconWrapper>
-              <LikeIcon onPress={() => updateLikes(postId)}>
-                    <AntDesign name="hearto" size={12} color="#E05936" />
+              <LikeIcon onPress={handleToggleLike}>
+                <AntDesign name={post.has_liked ? "heart" : "hearto"} size={12} color="#E05936" />
               </LikeIcon>
-              <LikeCount>{post.likes}</LikeCount>
+              <LikeCount>{post.like_count}</LikeCount>
               <ChatIcon>
-                    <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
+                <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
               </ChatIcon>
               <ChatCount>{totalCommentCount}</ChatCount>
             </IconWrapper>
@@ -189,9 +206,9 @@ export default function ComuPostedScreen() {
               <UserInfo>
                 <UserNameWrapper>
                   <UserCircle color={userCircleColors[comment.id]}>
-                    <UserFirstName>{userName.slice(1)}</UserFirstName>
+                    <UserFirstName>{comment.username.slice(1)}</UserFirstName>
                   </UserCircle>
-                  <UserName>{userName}</UserName>
+                  <UserName>{comment.username}</UserName>
                 </UserNameWrapper>
               </UserInfo>
               <DetailTimeWrapper>
@@ -235,7 +252,7 @@ export default function ComuPostedScreen() {
       <CommentsFooter>
         <InputBoxWrapper>
           <UserCircle2 color={getRandomPastelColor()}>
-            <UserFirstName>길동</UserFirstName>
+            <UserFirstName>{post.user_name.slice(1)}</UserFirstName>
           </UserCircle2>
           {replyToCommentId ? (
             <ReplyInputBox 
