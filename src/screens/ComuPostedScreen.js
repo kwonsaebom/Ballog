@@ -1,36 +1,42 @@
 //ComuPostedScreen.js
-import React, {useState, useContext, useMemo, useRef} from 'react';
-import { Keyboard } from 'react-native';
-import styled from 'styled-components/native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { PostsContext } from '../Context API/PostsContext';
-import { CommentsContext } from '../Context API/CommentsContext';
-import { getRandomPastelColor } from '../utils/colors';
-import ReplyIconImg from '../assets/icons/replyicon.png';
-import { Ionicons, AntDesign, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import React, { useState, useContext, useMemo, useRef } from "react";
+import { Keyboard } from "react-native";
+import styled from "styled-components/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { PostsContext } from "../Context API/PostsContext";
+import { CommentsContext } from "../Context API/CommentsContext";
+import { getRandomPastelColor } from "../utils/colors";
+import ReplyIconImg from "../assets/icons/replyicon.png";
+import {
+  Ionicons,
+  AntDesign,
+  MaterialCommunityIcons,
+  Feather,
+} from "@expo/vector-icons";
 
 export default function ComuPostedScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const {updateLikes, getPostById, deletePost} = useContext(PostsContext);
-  const {comments, addComment, addReply, getTotalCommentCount} = useContext(CommentsContext);
-  const {postId, category} = route.params || {};
+  const { updateLikes, getPostById, deletePost } = useContext(PostsContext);
+  const { comments, addComment, addReply, getTotalCommentCount } =
+    useContext(CommentsContext);
+  const { postId, category } = route.params || {};
   const [selectedCategory, setSelectedCategory] = useState(category);
-  const [userName, setUserName] = useState('익명');
+  const [userName, setUserName] = useState("익명");
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('');
+  const [modalType, setModalType] = useState("");
 
   const post = getPostById(postId);
 
-  const [inputValue, setInputValue] = useState('');
-  const [replyInputValue, setReplyInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
+  const [replyInputValue, setReplyInputValue] = useState("");
   const [replyToCommentId, setReplyToCommentId] = useState(null);
 
   const postComments = comments[postId] || [];
 
   const userCircleColors = useMemo(() => {
     const colors = {};
-    postComments.forEach(comment => {
+    postComments.forEach((comment) => {
       colors[comment.id] = getRandomPastelColor();
     });
     return colors;
@@ -40,45 +46,51 @@ export default function ComuPostedScreen() {
 
   const handleBackPress = () => {
     navigation.navigate("MainTabs", {
-      screen: '커뮤니티',
-      params: { category }
+      screen: "커뮤니티",
+      params: { category },
     });
   };
 
   const handleCommentSubmit = () => {
-    if (inputValue.trim() === '') return;
+    if (inputValue.trim() === "") return;
 
     const newComment = {
       id: Date.now().toString(),
       username: userName,
       detail: inputValue,
       date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       replies: [],
     };
 
     addComment(postId, newComment);
-    setInputValue('');
+    setInputValue("");
   };
 
   const handleReplySubmit = () => {
-    if (replyInputValue.trim() === '' || replyToCommentId === null) return;
+    if (replyInputValue.trim() === "" || replyToCommentId === null) return;
 
     const newReply = {
       id: Date.now().toString(),
       username: userName,
       detail: replyInputValue,
       date: new Date().toLocaleDateString(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
     addReply(postId, replyToCommentId, newReply);
-    setReplyInputValue('');
-    setReplyToCommentId(null); 
+    setReplyInputValue("");
+    setReplyToCommentId(null);
   };
 
   const handleEditPress = () => {
-    navigation.navigate('ComuWriteScreen', {
+    navigation.navigate("ComuWriteScreen", {
       postId: post.id,
       category: post.category,
     });
@@ -87,42 +99,45 @@ export default function ComuPostedScreen() {
   const handleDeletePress = () => {
     deletePost(postId);
     navigation.navigate("MainTabs", {
-      screen: '커뮤니티',
-      params: {category}
+      screen: "커뮤니티",
+      params: { category },
     });
   };
 
   const openReplyModal = (commentId) => {
     setReplyToCommentId(commentId);
-    setModalType('reply');
+    setModalType("reply");
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setModalType('');
+    setModalType("");
   };
 
   const confirmReply = () => {
     closeModal();
     if (inputRef.current) {
       inputRef.current.focus(); //작성 버튼 클릭 시 포커스
-      Keyboard.addListener('keyboardDidShow', () => {}); //키보드 활성화
+      Keyboard.addListener("keyboardDidShow", () => {}); //키보드 활성화
     }
     handleReplySubmit();
-  }
+  };
 
   const totalCommentCount = getTotalCommentCount(postId);
 
   return (
     <Wrapper>
-
       <ComuPostedHeader>
         <BackButton onPress={handleBackPress}>
           <Ionicons name="chevron-back" size={24} color="black" />
         </BackButton>
         <ScreenTitleWrapper>
-          <ScreenTitle>{selectedCategory === 'league' ? ('리그 커뮤니티') : ('마이팀 커뮤니티')}</ScreenTitle>
+          <ScreenTitle>
+            {selectedCategory === "league"
+              ? "리그 커뮤니티"
+              : "마이팀 커뮤니티"}
+          </ScreenTitle>
         </ScreenTitleWrapper>
       </ComuPostedHeader>
 
@@ -130,10 +145,10 @@ export default function ComuPostedScreen() {
         <ComuPostedBox>
           <WriterInfoBox>
             <WriterNameWrapper>
-                <WriterCircle>
-                  <FirstName>{post.author_name.slice(1)}</FirstName>
-                </WriterCircle>
-                <WriterName>{post.author_name}</WriterName>
+              <WriterCircle>
+                <FirstName>{post.author_name.slice(1)}</FirstName>
+              </WriterCircle>
+              <WriterName>{post.author_name}</WriterName>
             </WriterNameWrapper>
             <DateTime>{`${post.date} | ${post.time}`}</DateTime>
           </WriterInfoBox>
@@ -145,35 +160,43 @@ export default function ComuPostedScreen() {
               <PostDetailText>{post.detail}</PostDetailText>
             </PostDetail>
           </PostContents>
-          <ImageWrapper 
-            horizontal 
+          <ImageWrapper
+            horizontal
             hasImages={post.images.length > 0}
             showsHorizontalScrollIndicator={false}
           >
-          {post.images.map((imageUri, index) => (
-            <PostImage 
-              key={`${imageUri}-${index}`} 
-              source={{uri: imageUri}} 
-              isFirst={index === 0}
-              isLast={index === post.images.length - 1}
-            />
-          ))}
+            {post.images.map((imageUri, index) => (
+              <PostImage
+                key={`${imageUri}-${index}`}
+                source={{ uri: imageUri }}
+                isFirst={index === 0}
+                isLast={index === post.images.length - 1}
+              />
+            ))}
           </ImageWrapper>
           <PostFooter>
             <IconWrapper>
               <LikeIcon onPress={() => updateLikes(postId)}>
-                    <AntDesign name="hearto" size={12} color="#E05936" />
+                <AntDesign name="hearto" size={12} color="#E05936" />
               </LikeIcon>
               <LikeCount>{post.likes}</LikeCount>
               <ChatIcon>
-                    <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
+                <MaterialCommunityIcons
+                  name="message-reply-outline"
+                  size={12}
+                  color="#8892F7"
+                />
               </ChatIcon>
               <ChatCount>{totalCommentCount}</ChatCount>
             </IconWrapper>
             <ButtonWrapper>
               <EditDeleteButton onPress={handleEditPress}>
                 <ButtonText>수정</ButtonText>
-                <MaterialCommunityIcons name="pencil-outline" size={13} color="black" />
+                <MaterialCommunityIcons
+                  name="pencil-outline"
+                  size={13}
+                  color="black"
+                />
               </EditDeleteButton>
               <EditDeleteButton onPress={handleDeletePress}>
                 <ButtonText>삭제</ButtonText>
@@ -182,30 +205,34 @@ export default function ComuPostedScreen() {
             </ButtonWrapper>
           </PostFooter>
         </ComuPostedBox>
-          <LayoutBox>
+        <LayoutBox>
           {postComments.map((comment) => (
-          <CommetsBoxWrapper key={comment.id}>
-            <CommentsBox >
-              <UserInfo>
-                <UserNameWrapper>
-                  <UserCircle color={userCircleColors[comment.id]}>
-                    <UserFirstName>{userName.slice(1)}</UserFirstName>
-                  </UserCircle>
-                  <UserName>{userName}</UserName>
-                </UserNameWrapper>
-              </UserInfo>
-              <DetailTimeWrapper>
-                <CommentDetail>{comment.detail}</CommentDetail>
-                <DetailFooter>
-                  <DateTime>{`${comment.date} | ${comment.time}`}</DateTime>
-                  <ReplyButton onPress={() => {openReplyModal(comment.id)}}>
-                    <ReplyButtonText>답글</ReplyButtonText>
-                  </ReplyButton>
-                </DetailFooter>
-              </DetailTimeWrapper>
-            </CommentsBox>
+            <CommetsBoxWrapper key={comment.id}>
+              <CommentsBox>
+                <UserInfo>
+                  <UserNameWrapper>
+                    <UserCircle color={userCircleColors[comment.id]}>
+                      <UserFirstName>{userName.slice(1)}</UserFirstName>
+                    </UserCircle>
+                    <UserName>{userName}</UserName>
+                  </UserNameWrapper>
+                </UserInfo>
+                <DetailTimeWrapper>
+                  <CommentDetail>{comment.detail}</CommentDetail>
+                  <DetailFooter>
+                    <DateTime>{`${comment.date} | ${comment.time}`}</DateTime>
+                    <ReplyButton
+                      onPress={() => {
+                        openReplyModal(comment.id);
+                      }}
+                    >
+                      <ReplyButtonText>답글</ReplyButtonText>
+                    </ReplyButton>
+                  </DetailFooter>
+                </DetailTimeWrapper>
+              </CommentsBox>
 
-            {comment.replies.map(reply => (
+              {comment.replies.map((reply) => (
                 <ReplyBox key={reply.id}>
                   <ReplyIcon source={ReplyIconImg} />
                   <UserInfo>
@@ -226,9 +253,9 @@ export default function ComuPostedScreen() {
                     </DetailFooter>
                   </DetailTimeWrapper>
                 </ReplyBox>
-            ))}
-          </CommetsBoxWrapper>
-        ))}
+              ))}
+            </CommetsBoxWrapper>
+          ))}
         </LayoutBox>
       </ScrollContainer>
 
@@ -238,24 +265,26 @@ export default function ComuPostedScreen() {
             <UserFirstName>길동</UserFirstName>
           </UserCircle2>
           {replyToCommentId ? (
-            <ReplyInputBox 
+            <ReplyInputBox
               ref={inputRef}
-              placeholder='답글을 입력해주세요' 
-              placeholderTextColor={'#B5B5B5'} 
+              placeholder="답글을 입력해주세요"
+              placeholderTextColor={"#B5B5B5"}
               multiline
               value={replyInputValue}
               onChangeText={setReplyInputValue}
             />
           ) : (
-            <CommentInputBox 
-              placeholder='댓글을 입력해주세요' 
-              placeholderTextColor={'#B5B5B5'} 
+            <CommentInputBox
+              placeholder="댓글을 입력해주세요"
+              placeholderTextColor={"#B5B5B5"}
               multiline
               value={inputValue}
               onChangeText={setInputValue}
             />
           )}
-          <UploadButton onPress={replyToCommentId ? handleReplySubmit : handleCommentSubmit}>
+          <UploadButton
+            onPress={replyToCommentId ? handleReplySubmit : handleCommentSubmit}
+          >
             <Feather name="send" size={24} color="#C51E3A" />
           </UploadButton>
         </InputBoxWrapper>
@@ -277,7 +306,7 @@ export default function ComuPostedScreen() {
         </ReplyModalWrapper>
       )}
     </Wrapper>
-  )
+  );
 }
 
 const Wrapper = styled.View`
@@ -287,7 +316,7 @@ const Wrapper = styled.View`
 
 const ComuPostedHeader = styled.View`
   border-width: 1px;
-  border-color: #DBDBDB;
+  border-color: #dbdbdb;
   background-color: #fff;
   width: 100%;
   height: 42px;
@@ -310,7 +339,7 @@ const ScreenTitleWrapper = styled.View`
 `;
 
 const ScreenTitle = styled.Text`
-  font-family: 'Inter-Bold';
+  font-family: "Inter-Bold";
   font-size: 17px;
 `;
 
@@ -339,25 +368,25 @@ const WriterCircle = styled.View`
   width: 37px;
   height: 37px;
   border-radius: 20px;
-  background-color: #E2B066;
+  background-color: #e2b066;
   justify-content: center;
   align-items: center;
   margin-right: 5px;
 `;
 
 const FirstName = styled.Text`
-  font-family: 'Inter-Bold';
+  font-family: "Inter-Bold";
   font-size: 15px;
   color: #fff;
 `;
 
 const WriterName = styled.Text`
-  font-family: 'Inter-Bold';
+  font-family: "Inter-Bold";
   font-size: 15px;
 `;
 
 const DateTime = styled.Text`
-  color: #AAAAAA;
+  color: #aaaaaa;
   font-size: 11px;
 `;
 
@@ -374,7 +403,7 @@ const PostTitle = styled.View`
 `;
 
 const PostTitleText = styled.Text`
-  font-family: 'Inter-Bold';
+  font-family: "Inter-Bold";
   font-size: 18px;
 `;
 
@@ -383,7 +412,7 @@ const PostDetail = styled.View`
 `;
 
 const PostDetailText = styled.Text`
-  font-family: 'Inter-Regular';
+  font-family: "Inter-Regular";
   font-size: 13px;
 `;
 
@@ -400,7 +429,7 @@ const PostFooter = styled.View`
 
 const ImageWrapper = styled.ScrollView`
   flex-direction: row;
-  height: ${({hasImages}) => (hasImages ? 'auto' : '25px')};
+  height: ${({ hasImages }) => (hasImages ? "auto" : "25px")};
   padding-top: 10px;
   padding-bottom: 10px;
 `;
@@ -411,9 +440,9 @@ const PostImage = styled.Image`
   height: 92px;
   border-radius: 13px;
   border-width: 1px;
-  border-color: #D9D9D9;
-  margin-left: ${({ isFirst }) => (isFirst ? '25px' : '0px')};
-  margin-right: ${({ isLast }) => (isLast ? '25px' : '13px')};
+  border-color: #d9d9d9;
+  margin-left: ${({ isFirst }) => (isFirst ? "25px" : "0px")};
+  margin-right: ${({ isLast }) => (isLast ? "25px" : "13px")};
   z-index: 1;
 `;
 
@@ -427,14 +456,14 @@ const LikeIcon = styled.TouchableOpacity``;
 const ChatIcon = styled.View``;
 
 const LikeCount = styled.Text`
-  color: #E05936;
+  color: #e05936;
   margin-right: 5px;
   margin-left: 2px;
   font-size: 14px;
 `;
 
 const ChatCount = styled.Text`
-  color: #8892F7;
+  color: #8892f7;
   font-size: 14px;
   margin-right: 3px;
   margin-left: 2px;
@@ -447,7 +476,7 @@ const ButtonWrapper = styled.View`
 
 const EditDeleteButton = styled.TouchableOpacity`
   flex-direction: row;
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   border-radius: 18px;
   width: 53px;
   justify-content: center;
@@ -457,13 +486,12 @@ const EditDeleteButton = styled.TouchableOpacity`
 `;
 
 const ButtonText = styled.Text`
-  font-family: 'Inter-Bold';
+  font-family: "Inter-Bold";
   font-size: 11px;
   margin-right: 2px;
 `;
 
-const CommetsBoxWrapper = styled.View`
-`;
+const CommetsBoxWrapper = styled.View``;
 
 const CommentsBox = styled.View`
   padding-top: 13px;
@@ -471,7 +499,7 @@ const CommentsBox = styled.View`
   padding-left: 25px;
   padding-right: 25px;
   border-bottom-width: 0.5px;
-  border-bottom-color: #DBDBDB;
+  border-bottom-color: #dbdbdb;
 `;
 
 const UserInfo = styled.View`
@@ -497,18 +525,18 @@ const UserCircle = styled.View`
 `;
 
 const UserFirstName = styled.Text`
-  font-family: 'Inter-Bold';
+  font-family: "Inter-Bold";
   font-size: 11px;
   color: #fff;
 `;
 
 const UserName = styled.Text`
-  font-family: 'Inter-Bold';
+  font-family: "Inter-Bold";
   font-size: 12px;
 `;
 
 const CommentDetail = styled.Text`
-  font-family: 'Inter-Regular';
+  font-family: "Inter-Regular";
   font-size: 12px;
   margin-top: 5px;
   margin-bottom: 10px;
@@ -526,7 +554,7 @@ const DetailFooter = styled.View`
 const ReplyButton = styled.TouchableOpacity`
   margin-left: 10px;
   border-width: 0.5px;
-  border-color: #AAAAAA;
+  border-color: #aaaaaa;
   border-radius: 20px;
   width: 24.69px;
   height: 11.6px;
@@ -535,9 +563,9 @@ const ReplyButton = styled.TouchableOpacity`
 `;
 
 const ReplyButtonText = styled.Text`
-  font-family: 'Inter-Regular';
+  font-family: "Inter-Regular";
   font-size: 9px;
-  color: #AAAAAA;
+  color: #aaaaaa;
 `;
 
 const ReplyBox = styled.View`
@@ -546,7 +574,7 @@ const ReplyBox = styled.View`
   padding-left: 40px;
   padding-right: 25px;
   border-bottom-width: 0.5px;
-  border-bottom-color: #DBDBDB;
+  border-bottom-color: #dbdbdb;
   background-color: #f2f2f2;
 `;
 
@@ -562,7 +590,7 @@ const MyselfMark = styled.View`
   align-items: center;
   justify-content: center;
   border-width: 0.5px;
-  border-color: #C51E3A;
+  border-color: #c51e3a;
   border-radius: 20px;
   width: 15.95px;
   height: 10.61px;
@@ -571,8 +599,8 @@ const MyselfMark = styled.View`
 
 const MyselfMarkText = styled.Text`
   font-size: 8px;
-  color: #C51E3A;
-  font-family: 'Inter-Regular';
+  color: #c51e3a;
+  font-family: "Inter-Regular";
 `;
 
 const CommentsFooter = styled.View`
@@ -594,7 +622,7 @@ const InputBoxWrapper = styled.View`
   align-items: center;
   justify-content: space-between;
   border-radius: 36px;
-  border-color: #C51E3A;
+  border-color: #c51e3a;
   border-width: 1px;
   width: 100%;
   height: 48px;
@@ -610,7 +638,7 @@ const UserCircle2 = styled.View`
 `;
 
 const CommentInputBox = styled.TextInput`
-  font-family: 'Inter-Regular';
+  font-family: "Inter-Regular";
   width: 84%;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -621,7 +649,7 @@ const CommentInputBox = styled.TextInput`
 const LayoutBox = styled.View``;
 
 const ReplyInputBox = styled.TextInput`
-  font-family: 'Inter-Regular';
+  font-family: "Inter-Regular";
   width: 84%;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -629,8 +657,7 @@ const ReplyInputBox = styled.TextInput`
   padding-right: 10px;
 `;
 
-const UploadButton = styled.TouchableOpacity`
-`;
+const UploadButton = styled.TouchableOpacity``;
 
 const ReplyModalWrapper = styled.View`
   position: absolute;
@@ -650,7 +677,7 @@ const ReplyModal = styled.View`
 `;
 
 const ReplyOptionText = styled.Text`
-  font-family: 'Inter-Regular';
+  font-family: "Inter-Regular";
   font-size: 16px;
 `;
 
@@ -663,7 +690,7 @@ const OptionButtonWrapper = styled.View`
 `;
 
 const OptionButton = styled.TouchableOpacity`
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   width: 38px;
   height: 19px;
   border-radius: 18px;
@@ -671,7 +698,7 @@ const OptionButton = styled.TouchableOpacity`
   align-items: center;
 `;
 
-const OptionButtonText = styled. Text`
-  font-family: 'Inter-Regular';
+const OptionButtonText = styled.Text`
+  font-family: "Inter-Regular";
   font-size: 13px;
 `;

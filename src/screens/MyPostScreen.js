@@ -11,6 +11,10 @@ const MyPostScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
+  const post_id = 373;
+
+  const post_id_mvp = 382;
+
   const navigateBack = () => {
     navigation.goBack();
   };
@@ -50,7 +54,7 @@ const MyPostScreen = () => {
       <View style={styles.BlogContainer}>
         <TouchableOpacity
           style={styles.BlogButton}
-          onPress={() => navigation.navigate("CheckBlog")}
+          onPress={() => navigation.navigate("CheckBlog", { post_id })}
         >
           <View style={styles.Tab}>
             <Text style={styles.TabText}>BLOG</Text>
@@ -104,7 +108,7 @@ const MyPostScreen = () => {
       <View style={styles.MvpContainer}>
         <TouchableOpacity
           style={styles.BlogButton}
-          onPress={() => navigation.navigate("CheckMVP")}
+          onPress={() => navigation.navigate("CheckMVP", { post_id_mvp })}
         >
           <View style={styles.Tab}>
             <Text style={styles.TabText}>MVP</Text>

@@ -1,4 +1,3 @@
-// MyPageScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -13,6 +12,7 @@ import { Calendar } from "react-native-calendars";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 import axios from "axios";
+
 
 const MyPageScreen = () => {
   const navigation = useNavigation();
@@ -79,7 +79,6 @@ const MyPageScreen = () => {
       navigation.navigate("MyPostScreen");
     }
   };
-
   const redDates = data && data.writed_date_list ? data.writed_date_list : [];
   console.log("Fetched redDates:", redDates);
   const today = new Date().toISOString().split("T")[0];
@@ -141,6 +140,7 @@ const MyPageScreen = () => {
               ? "승"
               : "패"}
           </Text>
+
         </View>
         <View style={styles.Score}>
           <Image
@@ -226,10 +226,6 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginBottom: 10,
   },
-  SettingImage: {
-    height: 27,
-    width: 27,
-  },
   buttonGroup: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -306,10 +302,7 @@ const styles = StyleSheet.create({
     width: 59,
     height: 71,
   },
-  ScoreNum: {
-    fontSize: 26,
-    fontWeight: "800",
-  },
+
   ScoreNone: {
     fontSize: 15,
     fontWeight: "600",
