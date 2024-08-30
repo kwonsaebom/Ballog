@@ -16,8 +16,12 @@
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
+<<<<<<< HEAD
     "axios": "^1.7.3",
     "eventsource": "^2.0.2",
+=======
+    "axios": "^1.7.5",
+>>>>>>> feature/notification
     "expo": "~51.0.21",
     "expo-auth-session": "^5.5.2",
     "expo-av": "^14.0.6",
@@ -42,8 +46,12 @@
     "react-native-web": "~0.19.10",
     "react-native-web-swiper": "^2.2.4",
     "react-native-webview": "13.8.6",
+<<<<<<< HEAD
     "react-player": "^2.16.0",
+=======
+>>>>>>> feature/notification
     "react-redux": "^9.1.2",
+    "socket.io-client": "^4.7.5",
     "styled-components": "^6.1.12"
   },
   "devDependencies": {
