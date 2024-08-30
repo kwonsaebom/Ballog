@@ -12,7 +12,7 @@ import { Calendar } from "react-native-calendars";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 import axios from "axios";
-
+import { API_TOKEN } from "@env";
 
 const MyPageScreen = () => {
   const navigation = useNavigation();
@@ -29,11 +29,10 @@ const MyPageScreen = () => {
     // 데이터를 가져오는 함수
     const fetchData = async () => {
       try {
-        const accessToken = "~";
         // 토큰 Bearer을 제외한 부분 넣어야함
         const response = await axios.get("https://api.ballog.store/myPage", {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${API_TOKEN}`,
           },
         }); // 실제 API 엔드포인트로 교체
 
