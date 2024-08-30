@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, Button, Image, StyleSheet } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { getPresignedUrl, uploadFileToS3 } from '../components/S3';
+// ClipsScreen.js
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import VideoScreen from "./video"
 
 const ClipsScreen = () => {
   const [image, setImage] = useState(null);
@@ -61,10 +61,14 @@ const ClipsScreen = () => {
   // {image && } 이 부분이 선택한 이미지를 화면에 출력하는 코드
   return (
     <View style={styles.container}>
+<<<<<<< HEAD
       <Text style={styles.title}>경기 짤방</Text>
       <Button title="이미지 선택" onPress={pickImage} />
       {image && <Image source={{ uri: image }} style={styles.image} />}
       <Button title="업로드" onPress={handleUpload} disabled={uploading} />
+=======
+      <VideoScreen />
+>>>>>>> feature/video
     </View>
   );
 };
