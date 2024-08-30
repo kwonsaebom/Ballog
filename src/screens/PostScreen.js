@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components/native";
 import { colors, fonts } from "../global";
 import RNPickerSelect from "react-native-picker-select";
@@ -16,13 +16,35 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { API_TOKEN } from "@env";
+import { store } from "../utils/secureStore";
 
 const PostScreen = () => {
+  
   const [selectedValue, setSelectedValue] = useState("blog");
   const [blogData, setBlogData] = useState({});
   const [mvpData, setMvpData] = useState({});
   const [uploading, setUploading] = useState(false);
   const [resetKey, setResetKey] = useState(0); // 리렌더링을 위한 키
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    async function getToken() {
+      console.log('Component mounted');
+      try {
+        const token = await store.get("Authorization");
+        setToken(token);  // token 값을 상태에 저장
+      } catch (error) {
+        console.error('Error get token:', error);
+      }
+    }
+
+    // 비동기 함수 호출
+    getToken();
+
+    return () => {
+      console.log('Cleanup if necessary');
+    };
+  }, []);
 
   const resetBlogData = () => {
     setBlogData({});
@@ -105,7 +127,7 @@ const PostScreen = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
+            Authorization: token,
             "Content-Type": "application/json",
           },
         }

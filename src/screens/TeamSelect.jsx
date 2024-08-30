@@ -12,21 +12,43 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { API_TOKEN } from "@env";
+import { store } from "../utils/secureStore";
 
 const TeamSelect = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [teamData, setTeamData] = useState([]);
+  const [token, setToken] = useState(null);
 
+  useEffect(() => {
+    async function getToken() {
+      console.log('Component mounted');
+      try {
+        const token = await store.get("Authorization");
+        console.log(token);
+        setToken(token);  // token 값을 상태에 저장
+      } catch (error) {
+        console.error('Error get token:', error);
+      }
+    }
+
+    // 비동기 함수 호출
+    getToken();
+
+    return () => {
+      console.log('Cleanup if necessary');
+    };
+  }, []);
   useEffect(() => {
     // 데이터를 가져오는 함수
     const fetchData = async () => {
+      const token = await store.get("Authorization");
       try {
         // 토큰 Bearer을 제외한 부분 넣어야함
         const response = await axios.get(
           "https://api.ballog.store/myPage/setting/teamSetting",
           {
             headers: {
-              Authorization: `Bearer ${API_TOKEN}`,
+              Authorization: token,
             },
           }
         ); // 실제 API 엔드포인트로 교체
@@ -69,7 +91,7 @@ const TeamSelect = () => {
           },
           {
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: token,
             },
           }
         );

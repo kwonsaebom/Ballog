@@ -1,21 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors } from '../global';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { store } from '../utils/secureStore'
+import axios from 'axios';
 
 const ProfileImage = () => {
+
+  const [userName, setUserName] = useState(null); // State to hold
+  const [userIcon, setUserIcon] = useState(null); //
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = await store.get('Authorization');
+        
+        if (token) {
+          const url = 'https://api.ballog.store/auth/signUp/setting';
+          const response = await axios.get(url, {
+            headers: {
+              Authorization: token, // Set Authorization header
+            },
+          });
+          setUserName(response.data.result.user_name); // Set user_name to state
+          setUserIcon(response.data.result.user_icon); // Set user_icon URL to state
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error, "여기야?");
+      }
+    };
+
+    fetchData(); // Fetch data when component mounts or token changes
+  }, []); // Empty dependency array to run only once on mount
   
-
   const navigation = useNavigation(); // Initialize navigation
+  const onPressHandler = () => {
+      navigation.navigate('TeamSelect'); // Navigate to LoginPage
+  };
+  const navigateBack = () => {
+    navigation.goBack();
+  };
 
-    const onPressHandler = () => {
-        navigation.navigate('TeamSelect'); // Navigate to LoginPage
-    };
-
-    const navigateBack = () => {
-      navigation.goBack();
-    };
 
   return (
     <View style={styles.wrapper}>
@@ -27,11 +53,11 @@ const ProfileImage = () => {
           <Text style={styles.SelectText}><Text style={styles.MyTeam}>Ballog </Text>에서 사용할 {'\n'}프로필 사진을 등록하세요</Text>
         </View>
         <View style={styles.buttonContainer}>
-            <Image style={styles.image} source={require('../assets/Profile.png')} />
+            <Image style={styles.image} source={{ uri: userIcon }} />
             <TouchableOpacity style={styles.uploadButton} onPress={onPressHandler}>
                 <Image style={styles.Uploadimage} source={require('../assets/Upload.png')} />
             </TouchableOpacity>
-            <Text style={styles.username}>홍길동</Text>
+            <Text style={styles.username}>{userName}</Text>
             <TouchableOpacity style={styles.button} onPress={onPressHandler}>
               <Text style={styles.buttonText}>시작하기</Text>
             </TouchableOpacity>

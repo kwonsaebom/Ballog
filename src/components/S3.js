@@ -1,13 +1,14 @@
-import { API_TOKEN } from "@env";
+import { store } from "../utils/secureStore";
 
 export const getPresignedUrl = async (fileName, fileLocation, fileType) => {
   // S3 프리사인드 URL을 요청하는 함수
+  const token = await store.get("Authorization");
   try {
-    console.log("API_TOKEN:", API_TOKEN);
+    console.log("API_TOKEN:", token);
     const response = await fetch("https://api.ballog.store/api-utils/s3", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${API_TOKEN}`,
+        Authorization: token,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
