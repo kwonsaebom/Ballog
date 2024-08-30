@@ -1,8 +1,22 @@
 // MyPost.js
 import React, { useState } from "react";
-import {View, Text, StyleSheet, TouchableOpacity, Image, Modal, Pressable, TouchableWithoutFeedback,} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Modal,
+  Pressable,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons, AntDesign, MaterialCommunityIcons, Feather, } from "@expo/vector-icons";
+import {
+  Ionicons,
+  AntDesign,
+  MaterialCommunityIcons,
+  Feather,
+} from "@expo/vector-icons";
 import ModalComponent from "../components/Modal";
 
 const MyPostScreen = () => {
@@ -11,7 +25,7 @@ const MyPostScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
-  const post_id = 373;
+  const post_id = 539;
 
   const post_id_mvp = 382;
 
