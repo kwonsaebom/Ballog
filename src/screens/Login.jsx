@@ -5,6 +5,7 @@ import { WebView } from 'react-native-webview'; // WebView import
 import { useNavigation } from '@react-navigation/native';
 import { store } from '../utils/secureStore'
 import { getSocket } from '../utils/socket';  // 웹소켓을 관리하는 파일을 import
+import styled from 'styled-components/native';
 
 import axios from 'axios';
 
@@ -65,7 +66,7 @@ const Login = () => {
       <View style={styles.container}>
         <Text style={styles.text}>안녕하세요,{'\n'}회원가입을 환영합니다</Text>
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity style={styles.googlebutton} onPress={() => {
             setModalVisible(true)
             setModalUrl('https://api.ballog.store/auth/signUp/google')
           }
@@ -75,27 +76,27 @@ const Login = () => {
         </View>
         <Text style={styles.buttonText}>구글로 회원가입</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity style={styles.naverbutton} onPress={() => {
             setModalVisible(true)
             setModalUrl('https://api.ballog.store/auth/signUp/naver')
           }
         }>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={require('../assets/Google.png')} />
+          <Image style={styles.image} source={require('../assets/naverlogo.png')} />
         </View>
         <Text style={styles.buttonText}>네이버로 회원가입</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity style={styles.kakaobutton} onPress={() => {
             setModalVisible(true)
             setModalUrl('https://api.ballog.store/auth/signUp/kakao')
           }
         }>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={require('../assets/Google.png')} />
+          <Image style={styles.image} source={require('../assets/kakaologo.png')} />
         </View>
-        <Text style={styles.buttonText}>카카오로 회원가입</Text>
+        <Text style={styles.kakaobuttonText}>카카오로 회원가입</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity style={styles.googlebutton} onPress={() => {
             setModalVisible(true)
             setModalUrl('https://api.ballog.store/auth/login/google')
           }
@@ -105,25 +106,25 @@ const Login = () => {
         </View>
         <Text style={styles.buttonText}>구글로 계속하기</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity style={styles.naverbutton} onPress={() => {
             setModalVisible(true)
             setModalUrl('https://api.ballog.store/auth/login/naver')
           }
         }>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={require('../assets/Google.png')} />
+          <Image style={styles.image} source={require('../assets/naverlogo.png')} />
         </View>
         <Text style={styles.buttonText}>네이버로 계속하기</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity style={styles.kakaobutton} onPress={() => {
             setModalVisible(true)
             setModalUrl('https://api.ballog.store/auth/login/kakao')
           }
         }>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={require('../assets/Google.png')} />
+          <Image style={styles.image} source={require('../assets/kakaologo.png')} />
         </View>
-        <Text style={styles.buttonText}>카카오로 계속하기</Text>
+        <Text style={styles.kakaobuttonText}>카카오로 계속하기</Text>
       </TouchableOpacity>
       
       
@@ -181,10 +182,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 28,
   },
-  button: {
+  googlebutton: {
     backgroundColor: colors.primary,
     width: 342,
-    height: 55,
+    height: 50,
     borderRadius: 44,
     alignSelf: 'center',
     justifyContent: 'center',
@@ -192,11 +193,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: colors.primary,
-    
+    margin: 5,
+  },
+  naverbutton: {
+    backgroundColor: '#6AC569',
+    width: 342,
+    height: 50,
+    borderRadius: 44,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#6AC569',
+    margin: 5,
+  },
+  kakaobutton: {
+    backgroundColor: '#F2E147',
+    width: 342,
+    height: 50,
+    borderRadius: 44,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#F2E147',
+    margin: 5,
   },
   imageContainer: {
     width: 55,
-    height: 53,
+    height: 48,
     borderTopLeftRadius: 44,
     borderBottomLeftRadius: 44,
     overflow: 'hidden',
@@ -212,6 +239,13 @@ const styles = StyleSheet.create({
   buttonText: {
     flex: 1,
     color: '#fff',
+    fontWeight: '600',
+    fontSize: 17,
+    textAlign: 'center',
+  },
+  kakaobuttonText: {
+    flex: 1,
+    color: '#000',
     fontWeight: '600',
     fontSize: 17,
     textAlign: 'center',
