@@ -11,55 +11,72 @@ export default function ComuWriteScreen() {
   const route = useRoute();
   const {addPost, updatePost, getPostById} = useContext(PostsContext);
 
-  const category = route.params?.category || 'league';
+  const type = route.params?.type || 'league';
   const postId = route.params?.postId;
   const existingPost = postId ? getPostById(postId) : null;
 
-  const [posts, setPosts] = useState({
-    id: Date.now().toString(), // 임시로 랜덤 ID 생성
+  const [post, setPost] = useState(() => ({
+    postId: Date.now().toString(),
     title: '',
-    detail: '',
+    content: '',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
-    author_name: '홍길동', // 임시로 익명으로 설정
-    likes: 0,
-    comments: 0,
-    images: [],
-    category: category,
-  });
+    user_name: '사용자',
+    like_count: 0,
+    comment_count: 0,
+    imageUrls: [],
+    type: type,
+  }));
 
-  const { title, detail, images } = posts;
+  const { title, content, imageUrls } = post;
 
   useEffect(() => {
-    if (postId && existingPost) {
-      setPosts(existingPost);
+    if (postId) {
+        setPost(existingPost);
     }
-  }, [postId, existingPost]);
+  }, [postId]);
 
   const onChange = (name, value) => {
-    setPosts({
-        ...posts,
+    setPost({
+        ...post,
         [name]: value,
     });
   };
 
-  const handleRegister = () => {
-    if (posts.title.trim() === '' || posts.detail.trim() === '') {
-        alert('내용을 입력해주세요.');
+  const handleRegister = async () => {
+    if (post.title.trim() === '') {
+        alert('제목을 입력하세요.');
+        return;
+    }
+    if (post.content.trim() === '') {
+        alert('내용을 입력하세요.');
         return;
     }
 
+    let updatedPostId = post.postId;
+
     if (existingPost) {
-        updatePost(posts);
+        await updatePost(post);
+        navigation.navigate('ComuPostedScreen', {
+            postId: updatedPostId,
+            type: post.type,
+            postData: post // 수정된 게시글 데이터를 전달
+        });
     } else {
-        addPost(posts); // 새로운 게시글을 Context에 추가
+        updatedPostId = await addPost(post); // 새로운 게시글을 Context에 추가
+        if (updatedPostId) {
+            setPost({ ...post, postId: updatedPostId}); // 서버에서 받은 postId로 갱신
+        }
+        navigation.navigate('MainTabs', {
+            screen: '커뮤니티',
+            params: {
+                postId: post.postId, 
+                type: post.type,
+                updatedPost: post,
+            },
+            });
+        };
     }
-    
-    navigation.navigate('ComuPostedScreen', {
-        postId: posts.id, 
-        category: posts.category,
-    });
-  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -68,17 +85,17 @@ export default function ComuWriteScreen() {
         quality: 1,
     });
     if (!result.canceled) {
-        setPosts({
-            ...posts,
-            images: [...posts.images, ...result.assets.map(asset => asset.uri)],
+        setPost({
+            ...post,
+            imageUrls: [...post.imageUrls, ...result.assets.map(asset => asset.uri)],
         });
     }
   };
 
   const removeImage = (uriToRemove) => {
-    setPosts({
-      ...posts,
-      images: posts.images.filter(uri => uri !== uriToRemove),
+    setPost({
+      ...post,
+      imageUrls: post.imageUrls.filter(uri => uri !== uriToRemove),
     });
   };
 
@@ -89,10 +106,10 @@ export default function ComuWriteScreen() {
                 <Feather name="x" size={24} color="black" />
             </BackButton>
             <ScreenTitleWrapper>
-                <ScreenTitle>글 쓰기</ScreenTitle>
+                <ScreenTitle>{existingPost ? '글 수정하기' : '글 쓰기'}</ScreenTitle>
             </ScreenTitleWrapper>
             <RegisterButton onPress={handleRegister}>
-                <RegisterButtonText>등록하기</RegisterButtonText>
+                <RegisterButtonText>{existingPost ? '수정하기' : '등록하기'}</RegisterButtonText>
             </RegisterButton>
         </ComuWriteHeader>
         <ComuWriteBox>
@@ -109,8 +126,8 @@ export default function ComuWriteScreen() {
                 <WriteBoxDetail 
                 placeholder='내용을 입력하세요.' 
                 placeholderTextColor={'#919191'}
-                value={detail}
-                onChangeText={(value) => onChange('detail', value)}
+                value={content}
+                onChangeText={(value) => onChange('content', value)}
                 multiline
                 />
             </WriteBoxDetailWrapper>
@@ -128,7 +145,7 @@ export default function ComuWriteScreen() {
              horizontal
              showsHorizontalScrollIndicator={false}
             >
-                {images.map((uri, index) => (
+                {imageUrls.map((uri, index) => (
                     <ImgWrapper key={index} >
                         <ImageThumbnail 
                         source={{uri}}

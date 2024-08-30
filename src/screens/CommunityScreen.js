@@ -1,18 +1,43 @@
 // CommunityScreen.js
-import React, {useState, useContext} from 'react';
+import React, {useState, useEffect,  useContext} from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { Feather, FontAwesome6 } from '@expo/vector-icons';
 import LeagueComuScreen from './LeagueComuScreen';
 import MyTeamComuScreen from './MyTeamComuScreen';
 import { PostsContext } from '../Context API/PostsContext';
+import Loading from '../components/Loading';
+import Error from '../components/Error';
 
 export default function CommunityScreen({ navigation }) {
-  const {posts} = useContext(PostsContext);
+  const {posts, setPosts, fetchPosts, loading, error} = useContext(PostsContext);
   const [selectedCategory, setSelectedCategory] = useState('league');
+  const route = useRoute();
 
-  const filteredPosts = selectedCategory === 'league'
-   ? posts.filter(post => post.category === 'league') || []
-    : posts.filter(post => post.category === 'myteam') || [];
+  useEffect(() => {
+    fetchPosts(selectedCategory); // 선택된 카테고리에 따라 포스트 가져오기
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      const updatedPost = route.params?.updatedPost;
+      if (updatedPost) {
+        setPosts(prevPosts => prevPosts.map(post => 
+          post.postId === updatedPost.postId ? updatedPost : post
+        ));
+      }
+    });
+  
+    return unsubscribe;
+  }, [selectedCategory, navigation, route.params?.updatedPost]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Error />;
+  }
+
+  const filteredPosts = posts.filter(post => post.type === selectedCategory);
 
   return (
     <Wrapper>
@@ -26,11 +51,11 @@ export default function CommunityScreen({ navigation }) {
             <TextWrapper1 isActive={selectedCategory === 'league'} />
           </CtgyButton>
           <CtgyButton 
-          onPress={() => {setSelectedCategory('myteam')}}
-          isActive={selectedCategory === 'myteam'}
+          onPress={() => {setSelectedCategory('team')}}
+          isActive={selectedCategory === 'team'}
           >
             <CtgyText>마이팀 커뮤니티</CtgyText>
-            <TextWrapper2 isActive={selectedCategory === 'myteam'} />
+            <TextWrapper2 isActive={selectedCategory === 'team'} />
           </CtgyButton>
         </CtgyWrapper>
         <InputBoxWrapper>
@@ -50,7 +75,7 @@ export default function CommunityScreen({ navigation }) {
         <MyTeamComuScreen posts={filteredPosts} />
       )}
       <ButtonWrapper>
-        <WriteButton onPress={() => navigation.navigate('ComuWriteScreen', {category: selectedCategory})}>
+        <WriteButton onPress={() => navigation.navigate('ComuWriteScreen', {type: selectedCategory})}>
           <FontAwesome6 name="pen" size={20} color="#fff" />
           <ButtonText>글 쓰기</ButtonText>
         </WriteButton>
