@@ -20,6 +20,12 @@ const ModifyScreen = () => {
   const [post_id, setPostId] = useState(null); // post_id를 저장할 상태
   const navigation = useNavigation();
   const route = useRoute();
+  const [blogData, setBlogData] = useState({ title: "", content: "" });
+  const [mvpData, setMvpData] = useState({ title: "", content: "" });
+
+  const handleDataChange = (data) => {
+    setBlogData(data);
+  };
 
   useEffect(() => {
     // route.params에서 post_id 가져오기
@@ -46,8 +52,8 @@ const ModifyScreen = () => {
           `https://api.ballog.store/board/post/${post_id}`,
           {
             post_type: "blog", // post_type 필드 추가
-            title: "Updated Title",
-            body: "Updated Content",
+            title: blogData.title,
+            body: blogData.content,
             img_urls: [], // 필요에 따라 수정
             match_id: 0, // match_id 필드 추가, 실제 값을 설정해야 합니다.
           },
@@ -65,8 +71,8 @@ const ModifyScreen = () => {
           `https://api.ballog.store/board/mvp/${post_id}`,
           {
             post_type: "mvp", // post_type 필드 추가
-            title: "Updated Title",
-            body: "Updated Content",
+            title: mvpData.title,
+            body: mvpData.content,
             img_urls: [], // 필요에 따라 수정
             match_id: 0, // match_id 필드 추가, 실제 값을 설정해야 합니다.
           },
@@ -130,8 +136,12 @@ const ModifyScreen = () => {
           </PostButton>
         </Bar>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {selectedValue === "blog" && <BlogScreen post_id={post_id} />}
-          {selectedValue === "mvp" && <MvpScreen />}
+          {selectedValue === "blog" && (
+            <BlogScreen post_id={post_id} onDataChange={handleDataChange} />
+          )}
+          {selectedValue === "mvp" && (
+            <MvpScreen post_id={post_id} onDataChange={handleDataChange} />
+          )}
         </ScrollView>
       </Container>
     </TouchableWithoutFeedback>

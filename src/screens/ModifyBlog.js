@@ -23,7 +23,7 @@ import axios from "axios";
 import { API_TOKEN } from "@env";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-const ModifyBlog = () => {
+const ModifyBlog = ({ onDataChange }) => {
   const route = useRoute();
   const navigation = useNavigation();
   const { post_id } = route.params || {}; // 안전하게 접근하기 위해 디폴트 객체 사용
@@ -69,31 +69,11 @@ const ModifyBlog = () => {
     }
   }, [post_id]);
 
-  const handleSave = async () => {
-    try {
-      await axios.put(
-        `https://api.ballog.store/board/post/${post_id}`,
-        {
-          title,
-          body: content,
-          img_urls: images, // 수정된 내용: `images`를 `img_urls`로 전송
-          game_date: gameDate ? gameDate.toISOString() : null,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
-      Alert.alert("Success", "Blog post updated successfully.");
-      navigation.goBack();
-    } catch (error) {
-      console.error("Error updating blog post:", error);
-      Alert.alert("Error", "Failed to update blog post.");
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange({ title, content });
     }
-  };
+  }, [title, content]);
 
   useEffect(() => {
     (async () => {

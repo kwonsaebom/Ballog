@@ -19,7 +19,11 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-const ModifyMvp = () => {
+import { useNavigation, useRoute } from "@react-navigation/native";
+
+const ModifyMvp = ({ onDataChange }) => {
+  const route = useRoute();
+  const { post_id } = route.params || {};
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [playerContent, setPlayerContent] = useState("");
@@ -34,6 +38,35 @@ const ModifyMvp = () => {
   const [textAlign, setTextAlign] = useState("left");
   const [textColor, setTextColor] = useState(colors.text);
   const [textSize, setTextSize] = useState(fonts.sizes.small); // 기본 글자 크기
+
+  useEffect(() => {
+    if (post_id) {
+      const fetchBlogData = async () => {
+        try {
+          const response = await axios.get(
+            `https://api.ballog.store/board/post/${post_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${API_TOKEN}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            }
+          );
+          const data = response.data.result;
+          setTitle(data.title);
+          setContent(data.body);
+          setGameDate(data.game_date ? new Date(data.game_date) : null);
+          setImages(data.images || []);
+        } catch (error) {
+          console.error("Error fetching blog data:", error);
+          Alert.alert("Error", "Failed to fetch blog data.");
+        }
+      };
+
+      fetchBlogData();
+    }
+  }, [post_id]);
 
   useEffect(() => {
     (async () => {
@@ -51,6 +84,12 @@ const ModifyMvp = () => {
     setGameDate(date);
     setDatePickerVisibility(false);
   };
+
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange({ title, content });
+    }
+  }, [title, content]);
 
   const pickPlayerImage = async () => {
     console.log("pickPlayerImage function called");

@@ -25,7 +25,7 @@ const MyPostScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
 
-  const post_id = 539;
+  const post_id = 553;
 
   const post_id_mvp = 382;
 
