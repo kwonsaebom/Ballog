@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: width,
     height: calculatedHeight,
     flex: 1,
-    paddingTop: calculatedHeight
+    paddingTop: 0
   },
   videoContainer: {
     width: width,

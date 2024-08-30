@@ -26,27 +26,28 @@ const Login = () => {
   const fetchData = async (url) => {
     try {
       const response = await axios.get(url);
-      const data = response.data;
-      const accesstoken = response.headers.authorization;
+      const Authorization = response.headers.authorization;
       const refreshtoken = response.headers.refreshtoken;
       const user_id = response.headers.user_id;
-      store.save('Authorization', authorization);
+      store.save('Authorization', Authorization);
       store.save('refreshtoken', refreshtoken);
       store.save('user_id', user_id);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error, "여기야?");
     }
   };  
 
   const handleNavigationStateChange = (navState) => {
     const url = navState.url;
+    console.log(url)
     if (url !== redirectUrl && url.includes('redirect') && !url.includes('oauth')) {
+      console.log(url)
       setRedirectUrl(url);
       const code = url.split('?')[1]
       const token_url = modalUrl + '/token?' + code
       fetchData(token_url)
     }
-    setModalVisible(false);
+    //setModalVisible(false);
     onPressHandler()
   };
 

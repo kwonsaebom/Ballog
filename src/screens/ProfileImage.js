@@ -14,7 +14,7 @@ const ProfileImage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = await store.get('accessToken');
+        const token = await store.get('Authorization');
         
         if (token) {
           const url = 'https://api.ballog.store/auth/signUp/setting';
@@ -27,7 +27,7 @@ const ProfileImage = () => {
           setUserIcon(response.data.result.user_icon); // Set user_icon URL to state
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error, "여기야?");
       }
     };
 

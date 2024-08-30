@@ -1,14 +1,4 @@
 // App.js
-<<<<<<< HEAD
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import useFonts from "./src/hooks/useFonts";
-import StackNavigator from "./src/navigation/StackNavigator";
-import { PostsProvider } from "./src/Context API/PostsContext";
-import { CommentsProvider } from "./src/Context API/CommentsContext";
-
-export default function App() {
-=======
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
@@ -25,7 +15,6 @@ export default function App() {
     getSocket(userId); // 앱이 시작될 때 웹소켓 연결 초기화
   }, []);
   
->>>>>>> feature/notification
   const fontsLoaded = useFonts();
 
   if (!fontsLoaded) {
