@@ -15,7 +15,13 @@ import { API_TOKEN } from "@env";
 const Comment = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { post_id } = route.params;
+
+  // Extract both `post_id` and `post_id_mvp` from route params
+  const { post_id, post_id_mvp } = route.params;
+
+  // Determine which ID to use
+  const resolvedPostId = post_id_mvp || post_id;
+
   const [blogData, setBlogData] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [newReply, setNewReply] = useState("");
@@ -48,16 +54,20 @@ const Comment = () => {
     Keyboard.dismiss();
     setSelectedCommentId(null); // 터치 시 답글 입력 모드를 해제
   };
+
   const fetchBlogData = async () => {
     try {
       const apiUrl = "https://api.ballog.store";
-      const response = await axios.get(`${apiUrl}/board/post/${post_id}`, {
-        headers: {
-          Authorization: `Bearer ${API_TOKEN}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
+      const response = await axios.get(
+        `${apiUrl}/board/post/${resolvedPostId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${API_TOKEN}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
       setBlogData(response.data.result);
     } catch (error) {
       console.error("Error fetching blog data:", error);
@@ -73,7 +83,7 @@ const Comment = () => {
         `${apiUrl}/api-utils/comment`,
         {
           body: newComment,
-          post_id: post_id,
+          post_id: resolvedPostId,
           post_user_id: blogData.user_id,
           post_type: "blog",
         },
@@ -107,7 +117,7 @@ const Comment = () => {
         `${apiUrl}/api-utils/reply`,
         {
           body: newReply,
-          post_id: post_id,
+          post_id: resolvedPostId,
           post_user_id: blogData.user_id,
           comment_id: selectedCommentId, // selectedCommentId 추가
           post_type: "blog",
@@ -266,7 +276,6 @@ const Comment = () => {
     </TouchableWithoutFeedback>
   );
 };
-
 const Wrapper = styled.View`
   flex: 1;
   background: white;

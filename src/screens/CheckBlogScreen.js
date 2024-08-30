@@ -444,7 +444,7 @@ const ScoreDate = styled.View`
 
 const DateText = styled.Text`
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
   color: black;
   font-weight: 900;
 `;
