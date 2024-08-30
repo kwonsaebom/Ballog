@@ -4,6 +4,7 @@ import { colors } from '../global';
 import { WebView } from 'react-native-webview'; // WebView import
 import { useNavigation } from '@react-navigation/native';
 import { store } from '../utils/secureStore'
+import { getSocket } from '../utils/socket';  // 웹소켓을 관리하는 파일을 import
 
 import axios from 'axios';
 
@@ -29,9 +30,11 @@ const Login = () => {
       const Authorization = response.headers.authorization;
       const refreshtoken = response.headers.refreshtoken;
       const user_id = response.headers.user_id;
+      console.log(Authorization, refreshtoken, user_id, "헤더")
       store.save('Authorization', Authorization);
       store.save('refreshtoken', refreshtoken);
       store.save('user_id', user_id);
+      getSocket(user_id)
     } catch (error) {
       console.error('Error fetching data:', error, "여기야?");
     }
@@ -39,16 +42,18 @@ const Login = () => {
 
   const handleNavigationStateChange = (navState) => {
     const url = navState.url;
-    console.log(url)
+    console.log(url, "test1")
     if (url !== redirectUrl && url.includes('redirect') && !url.includes('oauth')) {
-      console.log(url)
+      console.log(url, "test2")
       setRedirectUrl(url);
       const code = url.split('?')[1]
       const token_url = modalUrl + '/token?' + code
       fetchData(token_url)
+      setModalVisible(false)
+      onPressHandler()
     }
     //setModalVisible(false);
-    onPressHandler()
+    
   };
 
   return (

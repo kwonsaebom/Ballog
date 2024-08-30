@@ -10,7 +10,7 @@ const videos = [
   { id: '3', uri: 'https://ballog.s3.ap-northeast-2.amazonaws.com/video/test3.mp4' },
 ];
 
-const App = () => {
+const VideoScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const videoRefs = useRef({});
 
@@ -125,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default VideoScreen;
