@@ -10,13 +10,13 @@ import Loading from '../components/Loading';
 import Error from '../components/Error';
 
 export default function CommunityScreen({ navigation }) {
-  const {posts, setPosts, fetchPosts, loading, error} = useContext(PostsContext);
+  const {posts, setPosts, fetchPosts, loading, categoryPosts, error} = useContext(PostsContext);
   const [selectedCategory, setSelectedCategory] = useState('league');
   const route = useRoute();
 
   useEffect(() => {
     fetchPosts(selectedCategory); // 선택된 카테고리에 따라 포스트 가져오기
-
+    console.log('서버에 추가된 게시글!!!!:', categoryPosts.league.data);
     const unsubscribe = navigation.addListener('focus', () => {
       const updatedPost = route.params?.updatedPost;
       if (updatedPost) {
@@ -70,9 +70,9 @@ export default function CommunityScreen({ navigation }) {
         </InputBoxWrapper>
       </HeaderWrapper>
       {selectedCategory === 'league' ? (
-        <LeagueComuScreen posts={filteredPosts} />
+        <LeagueComuScreen posts={categoryPosts.league.data} />
       ) : (
-        <MyTeamComuScreen posts={filteredPosts} />
+        <MyTeamComuScreen posts={categoryPosts.team.data} />
       )}
       <ButtonWrapper>
         <WriteButton onPress={() => navigation.navigate('ComuWriteScreen', {type: selectedCategory})}>

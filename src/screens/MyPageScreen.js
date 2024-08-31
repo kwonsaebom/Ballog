@@ -12,16 +12,12 @@ import { Calendar } from "react-native-calendars";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 import axios from "axios";
-import { store } from "../utils/secureStore";
-import { API_TOKEN } from "@env";
+import { myPage_api } from "../api/myPage/myPage.api";
 
 const MyPageScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-
   const selectedTeam = route.params?.team;
-  const [data, setData] = useState(null); // 데이터 상태
-
   const backgroundImage = data?.opposition_icon_flag
     ? { uri: data.user_background_img }
     : require("../assets/basic.png"); // 기본 이미지
@@ -29,21 +25,14 @@ const MyPageScreen = () => {
   useEffect(() => {
     // 데이터를 가져오는 함수
     const fetchData = async () => {
-      const token = await store.get("Authorization");
       try {
-        // 토큰 Bearer을 제외한 부분 넣어야함
-        const response = await axios.get("https://api.ballog.store/myPage", {
-          headers: {
-            Authorization: token,
-          },
-        }); // 실제 API 엔드포인트로 교체
-
-        setData(response.data.result); // 데이터 설정
-        console.log("Fetched data:", response.data.result);
+        const data = await myPage_api.get()
+        setData(data); // 데이터 설정
+        console.log("Fetched data:", data);
       } catch (error) {
         if (error.response) {
           // 서버가 응답을 반환한 경우 (상태 코드가 2xx 범위 밖인 경우)
-          console.error("Error fetching data:", error.response.data);
+          console.error("Error fetching data!!:", error.response.data);
           console.error("Status code:", error.response.status);
           console.error("Headers:", error.response.headers);
         } else if (error.request) {
@@ -56,10 +45,9 @@ const MyPageScreen = () => {
         console.error("Error config:", error.config);
       }
     };
-
     fetchData(); // 컴포넌트 마운트 시 데이터 가져오기
   }, []);
-
+  const [data, setData] = useState({user_name:"test"}); // 데이터 상태
   const formatMatchDate = (dateString) => {
     const date = new Date(dateString);
     const month = date.getMonth() + 1; // 월 (0-11이므로 +1)
@@ -73,6 +61,7 @@ const MyPageScreen = () => {
 
   const onDayPress = (day) => {
     const selectedDate = day.dateString;
+    
     const isRedDate =
       markedDates[selectedDate] &&
       markedDates[selectedDate].selectedColor === "#E8A5B0";
@@ -116,6 +105,7 @@ const MyPageScreen = () => {
             <View style={styles.imageContainer}>
               <Image
                 style={styles.ProfileImage}
+                source={{uri:data.user_icon_url}}
               />
             </View>
             <Text style={styles.buttonText}>{data.user_name}</Text>
