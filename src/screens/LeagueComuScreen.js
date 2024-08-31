@@ -7,7 +7,7 @@ import ComuPostListScreen from './ComuPostListScreen';
 export default function LeagueComuScreen({posts}) {
   const {getPostById} = useContext(PostsContext);
   const {getTotalCommentCount} = useContext(CommentsContext);
-
+  console.log(posts)
   return (
     <ComuPostListScreen
       posts={posts} 

@@ -3,13 +3,11 @@ import React from 'react'
 import styled from 'styled-components/native'
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function ComuPostList({posts, getPostById, getTotalCommentCount, type}) {
+  const route = useRoute();
   const navigation = useNavigation();
-
-  console.log('ComuPostList 렌더링: posts = ', posts);
-
   if (!posts || posts.length === 0) {
     return (
       <DefaultTextWrapper>
@@ -22,23 +20,22 @@ export default function ComuPostList({posts, getPostById, getTotalCommentCount, 
     <ScrollWrapper showsVerticalScrollIndicator={false}>
       <ComuBoxWrapper>
         {posts.map((post, index) => {
-          const totalCommentCount = getTotalCommentCount(post.postId);
-          console.log(`렌더링 중인 게시글 id: ${post.postId}, 댓글 수: ${totalCommentCount}`);
+          const totalCommentCount = getTotalCommentCount(post.post_id);
+          console.log(`렌더링 중인 게시글 id: ${post.post_id}, 댓글 수: ${totalCommentCount}`);
             return(
               <ComuBox 
-                key={`${post.postId}-${index}`} 
+                key={`${post.post_id}-${index}`} 
                 isFirst={index === 0} 
                 isLast={index === post.length - 1}
                 onPress={() => {
-                  console.log(`게시글 클릭됨: postId=${post.postId}`);
+                  console.log(`게시글 클릭됨: post_id=${post.post_id}`);
                   navigation.navigate('ComuPostedScreen', {
-                    postId: post.postId, 
-                    type: post.type,
-                    postData: post, // 전체 게시글 데이터를 전달
+                    post_id: post.post_id, 
+                    type: type
                   });
                 }}
               >
-                <DetailBox hasImage={post.imageUrls && post.imageUrls.length > 0}>
+                <DetailBox hasImage={post.img_urls && post.img_urls.length > 0}>
                   <DetailWrapper>
                     <ComuTitle numberOfLines={1}>{post.title}</ComuTitle>
                     <ComuDetail numberOfLines={1}>{post.content}</ComuDetail>
@@ -54,12 +51,12 @@ export default function ComuPostList({posts, getPostById, getTotalCommentCount, 
                       </ChatIcon>
                       <ChatCount>{totalCommentCount}</ChatCount>
                     </IconWrapper>
-                    <DateTime>{`| ${post.date} ${post.time} | ${post.user_name}`}</DateTime>
+                    <DateTime>{`| ${post.created_at.split("T")[0]} ${post.created_at.split("T")[1].split(".")[0]}} | ${post.user_name}`}</DateTime>
                   </ComuFooter>
                 </DetailBox>
-                {post.imageUrls && post.imageUrls.length > 0 && (
+                {post.img_urls && post.img_urls.length > 0 && (
                 <ComuImgBox>
-                  <ComuImg key={index} source={{uri: post.imageUrls[0]}} />
+                  <ComuImg key={index} source={{uri: post.img_urls[0]}} />
                 </ComuImgBox>
                 )}
               </ComuBox>

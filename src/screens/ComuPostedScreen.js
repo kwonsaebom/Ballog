@@ -12,51 +12,49 @@ import { Ionicons, AntDesign, MaterialCommunityIcons, Feather } from '@expo/vect
 export default function ComuPostedScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const {toggleLike, getPostById, deletePost} = useContext(PostsContext);
+  const {toggleLike, getPostById, deletePost, getPostDetail} = useContext(PostsContext);
   const {comments, addComment, addReply, getTotalCommentCount} = useContext(CommentsContext);
-  
-  const {postId, category, postData} = route.params || {};
-  const post = postData || {
-    postId: '',
-    title: '',
-    content: '',
-    date: '',
-    time: '',
-    user_name: '사용자',
-    like_count: 0,
-    imageUrls: []
-  };
-
-  const [selectedCategory, setSelectedCategory] = useState(category);
+  const [selectedType, setSelectedType] = useState(type);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
-
   const [inputValue, setInputValue] = useState('');
   const [replyInputValue, setReplyInputValue] = useState('');
   const [replyToCommentId, setReplyToCommentId] = useState(null);
+  const [postDetail, setPostDetail] = useState({
+    "created_at": "2024-08-11T08:30:14.000Z",
+    img_urls: []
+  })
 
-  const postComments = comments[postId] || [];
+  const postComments = comments[post_id] || [];
 
+  const {post_id, type} = route.params;
+  useEffect(() => {
+    const postDetail = async () => {
+      const result = await getPostDetail(post_id);
+      setPostDetail(result);
+      setSelectedType(type)
+    };
+    postDetail()
+  }, [route])
   const userCircleColors = useMemo(() => {
     return postComments.reduce((colors, comment) => {
       colors[comment.id] = getRandomPastelColor();
       return colors;
     }, {});
   }, [postComments]);
-
   const inputRef = useRef(null);
 
   const handleBackPress = () => {
     navigation.navigate("MainTabs", {
       screen: '커뮤니티',
-      params: { type: post.type, updatedPost: post }
+      params: { type: selectedType, updatedPost: postDetail }
     });
   };
 
   const handleToggleLike = async () => {
     try {
       // 게시글의 ID를 기반으로 좋아요 상태를 토글
-      await toggleLike(post.postId);
+      await toggleLike(postDetail.post_id);
   } catch (error) {
       console.error('좋아요 상태를 변경하는 중 오류 발생:', error);
   }
@@ -67,14 +65,14 @@ export default function ComuPostedScreen() {
 
     const newComment = {
       id: Date.now().toString(),
-      username: post.user_name,
+      username: postDetail.user_name,
       detail: inputValue,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
       replies: [],
     };
 
-    addComment(postId, newComment);
+    addComment(postDetail.post_id, newComment);
     setInputValue('');
   };
 
@@ -83,29 +81,26 @@ export default function ComuPostedScreen() {
 
     const newReply = {
       id: Date.now().toString(),
-      username: post.user_name,
+      username: postDetail.user_name,
       detail: replyInputValue,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    addReply(postId, replyToCommentId, newReply);
+    addReply(post_id, replyToCommentId, newReply);
     setReplyInputValue('');
     setReplyToCommentId(null); 
   };
 
   const handleEditPress = () => {
-    navigation.navigate('ComuWriteScreen', {
-      postId: post.postId,
-      type: post.type,
-    });
+    navigation.navigate('ComuWriteScreen', postDetail);
   };
 
   const handleDeletePress = async () => {
-    await deletePost(postId);
+    await deletePost(postDetail.post_id);
     navigation.navigate("MainTabs", {
       screen: '커뮤니티',
-      params: {type}
+      params: selectedType
     });
   };
 
@@ -129,7 +124,7 @@ export default function ComuPostedScreen() {
     handleReplySubmit();
   }
 
-  const totalCommentCount = getTotalCommentCount(postId);
+  const totalCommentCount = getTotalCommentCount(postDetail.post_id);
 
   return (
     <Wrapper>
@@ -139,7 +134,7 @@ export default function ComuPostedScreen() {
           <Ionicons name="chevron-back" size={24} color="black" />
         </BackButton>
         <ScreenTitleWrapper>
-          <ScreenTitle>{selectedCategory === 'league' ? ('리그 커뮤니티') : ('마이팀 커뮤니티')}</ScreenTitle>
+          <ScreenTitle>{selectedType === 'league' ? ('리그 커뮤니티') : ('마이팀 커뮤니티')}</ScreenTitle>
         </ScreenTitleWrapper>
       </ComuPostedHeader>
 
@@ -148,55 +143,61 @@ export default function ComuPostedScreen() {
           <WriterInfoBox>
             <WriterNameWrapper>
                 <WriterCircle>
-                  <FirstName>{post.user_name ? post.user_name.slice(1) : ''}</FirstName>
+                  <FirstName>{postDetail.user_name}</FirstName>
                 </WriterCircle>
-                <WriterName>{post.user_name || '사용자'}</WriterName>
+                <WriterName>{postDetail.user_name || '사용자'}</WriterName>
             </WriterNameWrapper>
-            <DateTime>{`${post.date} | ${post.time}`}</DateTime>
+            <DateTime>{`${postDetail.created_at.split("T")[0]} | ${postDetail.created_at.split("T")[1].split(".")[0]}`}</DateTime>
           </WriterInfoBox>
           <PostContents>
             <PostTitle>
-              <PostTitleText>{post.title}</PostTitleText>
+              <PostTitleText>{postDetail.title}</PostTitleText>
             </PostTitle>
             <PostDetail>
-              <PostDetailText>{post.content}</PostDetailText>
+              <PostDetailText>{postDetail.content}</PostDetailText>
             </PostDetail>
           </PostContents>
           <ImageWrapper 
             horizontal 
-            hasImages={post.imageUrls.length > 0}
+            hasImages={postDetail.img_urls.length > 0}
             showsHorizontalScrollIndicator={false}
           >
-          {post.imageUrls.map((imageUri, index) => (
+          {postDetail.img_urls.map((url, index) => (
             <PostImage 
-              key={`${imageUri}-${index}`} 
-              source={{uri: imageUri}} 
+              key={`${url}url`} 
+              source={{uri: url}} 
               isFirst={index === 0}
-              isLast={index === post.imageUrls.length - 1}
+              isLast={index === postDetail.img_urls.length - 1}
             />
           ))}
           </ImageWrapper>
           <PostFooter>
             <IconWrapper>
               <LikeIcon onPress={handleToggleLike}>
-                <AntDesign name={post.has_liked ? "heart" : "hearto"} size={12} color="#E05936" />
+                {console.log(postDetail.has_liked)}
+                <AntDesign name={postDetail.has_liked ? "heart" : "hearto"} size={12} color="#E05936" />
               </LikeIcon>
-              <LikeCount>{post.like_count}</LikeCount>
+              <LikeCount>{postDetail.like_count}</LikeCount>
               <ChatIcon>
                 <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
               </ChatIcon>
               <ChatCount>{totalCommentCount}</ChatCount>
             </IconWrapper>
-            <ButtonWrapper>
-              <EditDeleteButton onPress={handleEditPress}>
-                <ButtonText>수정</ButtonText>
-                <MaterialCommunityIcons name="pencil-outline" size={13} color="black" />
-              </EditDeleteButton>
-              <EditDeleteButton onPress={handleDeletePress}>
-                <ButtonText>삭제</ButtonText>
-                <Feather name="trash-2" size={13} color="black" />
-              </EditDeleteButton>
-            </ButtonWrapper>
+            {
+              postDetail.isMine === true ? (
+                <ButtonWrapper>
+                  <EditDeleteButton onPress={handleEditPress}>
+                    <ButtonText>수정</ButtonText>
+                    <MaterialCommunityIcons name="pencil-outline" size={13} color="black" />
+                  </EditDeleteButton>
+                  <EditDeleteButton onPress={handleDeletePress}>
+                    <ButtonText>삭제</ButtonText>
+                    <Feather name="trash-2" size={13} color="black" />
+                  </EditDeleteButton>
+                </ButtonWrapper>
+              ) : null
+            }
+            
           </PostFooter>
         </ComuPostedBox>
           <LayoutBox>
@@ -206,7 +207,7 @@ export default function ComuPostedScreen() {
               <UserInfo>
                 <UserNameWrapper>
                   <UserCircle color={userCircleColors[comment.id]}>
-                    <UserFirstName>{comment.username.slice(1)}</UserFirstName>
+                    <UserFirstName>{comment.username}</UserFirstName>
                   </UserCircle>
                   <UserName>{comment.username}</UserName>
                 </UserNameWrapper>
@@ -228,7 +229,7 @@ export default function ComuPostedScreen() {
                   <UserInfo>
                     <UserNameWrapper>
                       <UserCircle color={getRandomPastelColor()}>
-                        <UserFirstName>{reply.username.slice(1)}</UserFirstName>
+                        <UserFirstName>{reply.username}</UserFirstName>
                       </UserCircle>
                       <UserName>{reply.username}</UserName>
                       <MyselfMark>
@@ -252,7 +253,7 @@ export default function ComuPostedScreen() {
       <CommentsFooter>
         <InputBoxWrapper>
           <UserCircle2 color={getRandomPastelColor()}>
-            <UserFirstName>{post.user_name.slice(1)}</UserFirstName>
+            <UserFirstName>{postDetail.user_name}</UserFirstName>
           </UserCircle2>
           {replyToCommentId ? (
             <ReplyInputBox 

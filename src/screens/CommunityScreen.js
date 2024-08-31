@@ -16,12 +16,11 @@ export default function CommunityScreen({ navigation }) {
 
   useEffect(() => {
     fetchPosts(selectedCategory); // 선택된 카테고리에 따라 포스트 가져오기
-    console.log('서버에 추가된 게시글!!!!:', categoryPosts.league.data);
     const unsubscribe = navigation.addListener('focus', () => {
       const updatedPost = route.params?.updatedPost;
       if (updatedPost) {
         setPosts(prevPosts => prevPosts.map(post => 
-          post.postId === updatedPost.postId ? updatedPost : post
+          post.post_id === updatedPost.post_id ? updatedPost : post
         ));
       }
     });
@@ -36,8 +35,6 @@ export default function CommunityScreen({ navigation }) {
   if (error) {
     return <Error />;
   }
-
-  const filteredPosts = posts.filter(post => post.type === selectedCategory);
 
   return (
     <Wrapper>
