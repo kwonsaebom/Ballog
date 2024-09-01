@@ -97,11 +97,16 @@ export default function ComuPostedScreen() {
   };
 
   const handleDeletePress = async () => {
-    await deletePost(postDetail.post_id);
-    navigation.navigate("MainTabs", {
-      screen: '커뮤니티',
-      params: selectedType
-    });
+    try {
+      await deletePost(postDetail.post_id);
+      console.log(`Post with ID ${postDetail.post_id} deleted successfully.`);
+      navigation.navigate("MainTabs", {
+        screen: '커뮤니티',
+        params: { type: selectedType, deletedPostId: postDetail.post_id }
+      });
+    } catch (err) {
+      console.error('Error deleting post:', err);
+    }
   };
 
   const openReplyModal = (commentId) => {
