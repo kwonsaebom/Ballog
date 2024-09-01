@@ -51,6 +51,8 @@ export default function ComuPostedScreen() {
     });
   };
 
+  console.log('updatedPost: ', postDetail);
+
   const handleToggleLike = async () => {
     try {
       // 게시글의 ID를 기반으로 좋아요 상태를 토글
