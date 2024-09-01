@@ -14,6 +14,9 @@ export default function ComuPostedScreen() {
   const navigation = useNavigation();
   const {toggleLike, getPostById, deletePost, getPostDetail} = useContext(PostsContext);
   const {comments, addComment, addReply, getTotalCommentCount} = useContext(CommentsContext);
+  
+  const {post_id, type} = route.params;
+
   const [selectedType, setSelectedType] = useState(type);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -25,9 +28,8 @@ export default function ComuPostedScreen() {
     img_urls: []
   })
 
-  const postComments = comments[post_id] || [];
+  const postComments = comments.filter(comment => comment.post_id === post_id);
 
-  const {post_id, type} = route.params;
   useEffect(() => {
     const postDetail = async () => {
       const result = await getPostDetail(post_id);
