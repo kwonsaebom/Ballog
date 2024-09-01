@@ -1,6 +1,7 @@
 //PostsContext.js
 import React, {useState} from 'react'
 import api from './api';
+import { community_api } from '../api/community/community.api';
 
 const PostsContext = React.createContext();
 
@@ -9,57 +10,53 @@ const PostsProvider = ({ children }) => {
   const [categoryPosts, setCategoryPosts] = useState({
     league: [],
     team: [],
-});
-const [loading, setLoading] = useState(false);
-const [error, setError] = useState(null);
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-const fetchPosts = async (type) => {
-  if (categoryPosts[type].length > 0) {
-      return; // 이미 데이터가 로드된 경우, 새로 요청하지 않음
-  }
-  setLoading(true);
-  setError(null);
-  try {
-      const response = await api.get(`/community/posts?type=${type}`);
-      if (response.data.isSuccess) {
-          console.log('서버에서 가져온 게시글:', response.data.result.data);
-          setCategoryPosts(prevState => ({
-              ...prevState,
-              [type]: response.data.result.data
-          }));
-      } else {
-        setError('게시글 로드 실패');
-      }
-  } catch (error) {
-    setError('게시글 로드 실패');
-    console.error('게시글 목록 불러오기 실패', error);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchPosts = async (type) => {
+    if (categoryPosts[type].length > 0) {
+        return; // 이미 데이터가 로드된 경우, 새로 요청하지 않음
+    }
+    setLoading(true);
+    setError(null);
+    try {
+        const response = await community_api.get_list(type)
+        setCategoryPosts(prevState => ({
+            ...prevState,
+            [type]: response.result
+        }));
+    } catch (error) {
+      setError('게시글 로드 실패');
+      console.error('게시글 목록 불러오기 실패', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getPostById = (id) => {
     console.log(`getPostById 호출됨: id=${id}`);
-    return posts.find(post => post.postId === id)
+    return posts.find(post => post.post_id === id)
   };
 
   const addPost = async (newPost) => {
+    const req = {
+      title: newPost.title,
+      content: newPost.content,
+      img_urls: newPost.img_urls,
+      type: newPost.type,
+    }
     try {
       setLoading(true);
-      const response = await api.post(`/community/post`, {
-        title: newPost.title,
-        content: newPost.content,
-        img_urls: newPost.imageUrls,
-        type: newPost.type,
-      });
-      if (response.data.isSuccess) {
-        const serverPostId = response.data.result; // 서버에서 반환된 postId
-        const updatedPost = { ...newPost, postId: serverPostId }; // postId 갱신
+      const response = await community_api.post(req);
+      if (response.isSuccess) {
+        const serverPost_id = response.result; // 서버에서 반환된 post_id
+        const updatedPost = { ...newPost, post_id: serverPost_id }; // post_id 갱신
         console.log('서버에 추가된 게시글:', updatedPost);
 
         setPosts([updatedPost, ...posts]); // posts 상태 업데이트
         console.log('업데이트된 posts 상태:', [updatedPost, ...posts]);
-        return serverPostId; // 서버에서 반환된 postId 반환
+        return serverPost_id; // 서버에서 반환된 post_id 반환
       } else {
         setError('게시글 작성 실패');
       }
@@ -74,15 +71,16 @@ const fetchPosts = async (type) => {
   const updatePost = async (updatedPost) => {
     try {
       setLoading(true);
-      const response = await api.patch(`/community/post/${updatedPost.postId}`, updatedPost);
+      //const response = await api.patch(`/community/post/${updatedPost.post_id}`, updatedPost);
+      const response = await community_api.patch(updatedPost, updatedPost.post_id);
       if (response.data.isSuccess) {
         console.log('서버에서 업데이트된 게시글:', updatedPost);
         setPosts(posts.map(post => 
-          post.postId === updatedPost.postId ? updatedPost : post
+          post.post_id === updatedPost.post_id ? updatedPost : post
         ));
         setCategoryPosts(prevState => {
           const updatedCategory = prevState[updatedPost.type].map(post => 
-            post.postId === updatedPost.postId ? updatedPost : post
+            post.post_id === updatedPost.post_id ? updatedPost : post
           );
           return {
             ...prevState,
@@ -99,12 +97,13 @@ const fetchPosts = async (type) => {
     }
   };
 
-  const deletePost = async (postId) => {
+  const deletePost = async (post_id) => {
+
     try {
       setLoading(true);
-      const response = await api.delete(`/community/post/${postId}`);
-      if (response.data.isSuccess) {
-        setPosts(posts.filter(post => post.postId !== postId));
+      const response = await community_api.delete(post_id);
+      if (response.isSuccess) {
+        setPosts(posts.filter(post => post.post_id !== post_id));
       } else {
         setError('게시글 삭제 실패');
       }
@@ -116,12 +115,12 @@ const fetchPosts = async (type) => {
     }
   };
 
-  const getPostDetail = async (postId) => {
+  const getPostDetail = async (post_id) => {
     try {
-      const response = await api.get(`/community/post/${postId}`);
-      if (response.data.isSuccess) {
-        console.log('글 상세 조회 성공:', response.data.result);
-        return response.data.result; // 게시글 상세 정보 반환
+      const response = await community_api.get(post_id);
+      if (response.isSuccess) {
+        console.log('글 상세 조회 성공:', response.result);
+        return response.result; // 게시글 상세 정보 반환
       } else {
         console.error('글 상세 조회 실패:', response.data.message);
       }
@@ -130,10 +129,10 @@ const fetchPosts = async (type) => {
     }
   };
 
-  const toggleLike = async (postId) => {
+  const toggleLike = async (post_id) => {
     try {
       // 현재 게시글 상태 가져오기
-      const post = posts.find(post => post.postId === postId);
+      const post = posts.find(post => post.post_id === post_id);
       const updatedPost = {
         ...post,
         has_liked: !post.has_liked, // 좋아요 상태 토글
@@ -141,11 +140,11 @@ const fetchPosts = async (type) => {
       };
   
       // UI 업데이트를 먼저 수행
-      setPosts(posts.map(post => post.postId === postId ? updatedPost : post));
+      setPosts(posts.map(post => post.post_id === post_id ? updatedPost : post));
   
       const post_user_id = 'test3'; // 실제 사용자 ID로 대체
       const response = await api.post(`/api-utils/post_like`, {
-        post_id: postId,
+        post_id: post_id,
         post_user_id,
         checked: updatedPost.has_liked, // 좋아요 상태 전달
         post_type: 'community',
@@ -166,7 +165,7 @@ const fetchPosts = async (type) => {
   };
 
   return (
-    <PostsContext.Provider value={{ posts, setPosts, fetchPosts, addPost, updatePost, deletePost, toggleLike, getPostById, getPostDetail, loading, error }}>
+    <PostsContext.Provider value={{ posts, setPosts, fetchPosts, addPost, updatePost, deletePost, toggleLike, getPostById, getPostDetail, loading, error, categoryPosts }}>
       {children}
     </PostsContext.Provider>
   );

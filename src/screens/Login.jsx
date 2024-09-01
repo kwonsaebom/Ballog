@@ -31,14 +31,13 @@ const Login = () => {
       const Authorization = response.headers.authorization;
       const refreshtoken = response.headers.refreshtoken;
       const user_id = response.headers.user_id;
-      console.log(Authorization, refreshtoken, user_id, "헤더")
       await store.save('Authorization', Authorization);
       await store.save('refreshtoken', refreshtoken);
       await store.save('user_id', user_id);
       getSocket(user_id)
       onPressHandler()
     } catch (error) {
-      console.error('Error fetching data:', error, "여기야?????");
+      console.error('Error fetching data:', error);
     }
   };  
 

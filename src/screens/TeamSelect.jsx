@@ -24,7 +24,6 @@ const TeamSelect = () => {
       console.log('Component mounted');
       try {
         const token = await store.get("Authorization");
-        console.log(token);
         setToken(token);  // token 값을 상태에 저장
       } catch (error) {
         console.error('Error get token:', error);
@@ -81,9 +80,9 @@ const TeamSelect = () => {
   const onPressHandler = async () => {
     if (selectedOption) {
       try {
-        const accessToken =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2FwaS5iYWxsb2cuc3RvcmUiLCJzdWIiOiJ0ZXN0MiIsImlhdCI6MTcyNDkzNzE2NiwiZXhwIjoxNzMwMTIxMTY2fQ.r29UK6qbIj8__WSif36FP1u6zpIrcMyAeVH-DhiIgVo"; // 실제 토큰으로 교체
-
+        await store.save("team_id", String(selectedOption.team_id))
+        
+        const token = await store.get("Authorization");
         const response = await axios.patch(
           "https://api.ballog.store/myPage/setting/teamSetting",
           {
@@ -134,7 +133,9 @@ const TeamSelect = () => {
                   selectedOption?.team_id === team.team_id &&
                     styles.selectedOptionButton,
                 ]}
-                onPress={() => setSelectedOption(team)} // 팀 선택
+                onPress={() => {
+                  setSelectedOption(team)
+                }} // 팀 선택
               >
                 <Text style={styles.optionButtonText}>{team.team_name}</Text>
                 <Image

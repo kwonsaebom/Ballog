@@ -10,24 +10,37 @@ import Loading from '../components/Loading';
 import Error from '../components/Error';
 
 export default function CommunityScreen({ navigation }) {
-  const {posts, setPosts, fetchPosts, loading, error} = useContext(PostsContext);
+  const {posts, setPosts, fetchPosts, loading, categoryPosts, error} = useContext(PostsContext);
   const [selectedCategory, setSelectedCategory] = useState('league');
   const route = useRoute();
 
   useEffect(() => {
     fetchPosts(selectedCategory); // 선택된 카테고리에 따라 포스트 가져오기
-
     const unsubscribe = navigation.addListener('focus', () => {
       const updatedPost = route.params?.updatedPost;
+      const deletedPostId = route.params?.deletedPostId;
+
       if (updatedPost) {
-        setPosts(prevPosts => prevPosts.map(post => 
-          post.postId === updatedPost.postId ? updatedPost : post
-        ));
-      }
+      setPosts(prevPosts => {
+        const updatedPosts = prevPosts.map(post => 
+          post.post_id === updatedPost.post_id ? updatedPost : post
+        );
+        console.log('Updated post:', updatedPost);
+        return updatedPosts;
+      });
+    }
+
+    if (deletedPostId) {
+      setPosts(prevPosts => {
+        const filteredPosts = prevPosts.filter(post => post.post_id !== deletedPostId);
+        console.log(`Deleted post with ID ${deletedPostId}. Remaining posts:`, filteredPosts);
+        return filteredPosts;
+      });
+    }
     });
   
     return unsubscribe;
-  }, [selectedCategory, navigation, route.params?.updatedPost]);
+  }, [selectedCategory, navigation, route.params?.updatedPost, route.params?.deletedPostId]);
 
   if (loading) {
     return <Loading />;
@@ -36,8 +49,6 @@ export default function CommunityScreen({ navigation }) {
   if (error) {
     return <Error />;
   }
-
-  const filteredPosts = posts.filter(post => post.type === selectedCategory);
 
   return (
     <Wrapper>
@@ -70,9 +81,9 @@ export default function CommunityScreen({ navigation }) {
         </InputBoxWrapper>
       </HeaderWrapper>
       {selectedCategory === 'league' ? (
-        <LeagueComuScreen posts={filteredPosts} />
+        <LeagueComuScreen posts={categoryPosts.league.data} />
       ) : (
-        <MyTeamComuScreen posts={filteredPosts} />
+        <MyTeamComuScreen posts={categoryPosts.team.data} />
       )}
       <ButtonWrapper>
         <WriteButton onPress={() => navigation.navigate('ComuWriteScreen', {type: selectedCategory})}>
