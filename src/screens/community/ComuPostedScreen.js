@@ -3,38 +3,34 @@ import React, {useState, useContext, useMemo, useRef, useEffect} from 'react';
 import { Keyboard } from 'react-native';
 import styled from 'styled-components/native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { PostsContext } from '../Context API/PostsContext';
-import { CommentsContext } from '../Context API/CommentsContext';
-import { getRandomPastelColor } from '../utils/colors';
-import ReplyIconImg from '../assets/icons/replyicon.png';
+import { CommentsContext } from '../../Context API/CommentsContext';
+import { getRandomPastelColor } from '../../utils/colors';
+import ReplyIconImg from '../../assets/icons/replyicon.png';
 import { Ionicons, AntDesign, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { communityContext } from '../../api/community/community.context';
 
 export default function ComuPostedScreen() {
   const route = useRoute();
   const navigation = useNavigation();
-  const {toggleLike, getPostById, deletePost, getPostDetail} = useContext(PostsContext);
   const {comments, addComment, addReply, getTotalCommentCount} = useContext(CommentsContext);
+  const { community_context, postData, postList } = useContext(communityContext);
   const [selectedType, setSelectedType] = useState(type);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [replyInputValue, setReplyInputValue] = useState('');
   const [replyToCommentId, setReplyToCommentId] = useState(null);
-  const [postDetail, setPostDetail] = useState({
-    "created_at": "2024-08-11T08:30:14.000Z",
-    img_urls: []
-  })
 
   const postComments = comments[post_id] || [];
 
   const {post_id, type} = route.params;
   useEffect(() => {
-    const postDetail = async () => {
-      const result = await getPostDetail(post_id);
-      setPostDetail(result);
+    const setPostData = async () => {
+      await community_context.get(post_id);
+      console.log(postData);
       setSelectedType(type)
     };
-    postDetail()
+    setPostData()
   }, [route])
   const userCircleColors = useMemo(() => {
     return postComments.reduce((colors, comment) => {
@@ -47,14 +43,14 @@ export default function ComuPostedScreen() {
   const handleBackPress = () => {
     navigation.navigate("MainTabs", {
       screen: '커뮤니티',
-      params: { type: selectedType, updatedPost: postDetail }
+      params: { type: selectedType, updatedPost: postData }
     });
   };
 
   const handleToggleLike = async () => {
     try {
       // 게시글의 ID를 기반으로 좋아요 상태를 토글
-      await toggleLike(postDetail.post_id);
+      
   } catch (error) {
       console.error('좋아요 상태를 변경하는 중 오류 발생:', error);
   }
@@ -65,14 +61,14 @@ export default function ComuPostedScreen() {
 
     const newComment = {
       id: Date.now().toString(),
-      username: postDetail.user_name,
+      username: postData.user_name,
       detail: inputValue,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}),
       replies: [],
     };
 
-    addComment(postDetail.post_id, newComment);
+    addComment(postData.post_id, newComment);
     setInputValue('');
   };
 
@@ -81,7 +77,7 @@ export default function ComuPostedScreen() {
 
     const newReply = {
       id: Date.now().toString(),
-      username: postDetail.user_name,
+      username: postData.user_name,
       detail: replyInputValue,
       date: new Date().toLocaleDateString(),
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -93,16 +89,17 @@ export default function ComuPostedScreen() {
   };
 
   const handleEditPress = () => {
-    navigation.navigate('ComuWriteScreen', postDetail);
+    navigation.navigate('ComuWriteScreen', postData);
   };
 
   const handleDeletePress = async () => {
     try {
-      await deletePost(postDetail.post_id);
-      console.log(`Post with ID ${postDetail.post_id} deleted successfully.`);
+      await community_context.delete(postData.post_id);
+      await community_context.get_list(type)
+      console.log(`Post with ID ${postData.post_id} deleted successfully.`);
       navigation.navigate("MainTabs", {
         screen: '커뮤니티',
-        params: { type: selectedType, deletedPostId: postDetail.post_id }
+        params: { type: selectedType }
       });
     } catch (err) {
       console.error('Error deleting post:', err);
@@ -129,7 +126,7 @@ export default function ComuPostedScreen() {
     handleReplySubmit();
   }
 
-  const totalCommentCount = getTotalCommentCount(postDetail.post_id);
+  const totalCommentCount = getTotalCommentCount(postData.post_id);
 
   return (
     <Wrapper>
@@ -148,48 +145,54 @@ export default function ComuPostedScreen() {
           <WriterInfoBox>
             <WriterNameWrapper>
                 <WriterCircle>
-                  <FirstName>{postDetail.user_name}</FirstName>
+                  <FirstName>{postData.user_name}</FirstName>
                 </WriterCircle>
-                <WriterName>{postDetail.user_name || '사용자'}</WriterName>
+                <WriterName>{postData.user_name || '사용자'}</WriterName>
             </WriterNameWrapper>
-            <DateTime>{`${postDetail.created_at.split("T")[0]} | ${postDetail.created_at.split("T")[1].split(".")[0]}`}</DateTime>
+            <DateTime>{`${postData.created_at.split("T")[0]} | ${postData.created_at.split("T")[1].split(".")[0]}`}</DateTime>
           </WriterInfoBox>
           <PostContents>
             <PostTitle>
-              <PostTitleText>{postDetail.title}</PostTitleText>
+              <PostTitleText>{postData.title}</PostTitleText>
             </PostTitle>
-            <PostDetail>
-              <PostDetailText>{postDetail.content}</PostDetailText>
-            </PostDetail>
+            <PostData>
+              <PostDataText>{postData.content}</PostDataText>
+            </PostData>
           </PostContents>
           <ImageWrapper 
             horizontal 
-            hasImages={postDetail.img_urls.length > 0}
+            hasImages={postData.img_urls.length > 0}
             showsHorizontalScrollIndicator={false}
           >
-          {postDetail.img_urls.map((url, index) => (
+          {postData.img_urls.map((url, index) => (
             <PostImage 
               key={`${url}url`} 
               source={{uri: url}} 
               isFirst={index === 0}
-              isLast={index === postDetail.img_urls.length - 1}
+              isLast={index === postData.img_urls.length - 1}
             />
           ))}
           </ImageWrapper>
           <PostFooter>
             <IconWrapper>
               <LikeIcon onPress={handleToggleLike}>
-                {console.log(postDetail.has_liked)}
-                <AntDesign name={postDetail.has_liked ? "heart" : "hearto"} size={12} color="#E05936" />
+                {console.log(postData.has_liked)}
+                <AntDesign name={postData.has_liked ? "heart" : "hearto"} size={12} color="#E05936" />
               </LikeIcon>
-              <LikeCount>{postDetail.like_count}</LikeCount>
-              <ChatIcon>
-                <MaterialCommunityIcons name="message-reply-outline" size={12} color="#8892F7" />
+              <LikeCount>{postData.like_count}</LikeCount>
+              <ChatIcon
+                onPress={() => navigation.navigate("Comment", postData )}
+              >
+                <MaterialCommunityIcons
+                  name="message-reply-outline"
+                  size={21}
+                  color="#8892F7"
+                />
               </ChatIcon>
               <ChatCount>{totalCommentCount}</ChatCount>
             </IconWrapper>
             {
-              postDetail.isMine === true ? (
+              postData.isMine === true ? (
                 <ButtonWrapper>
                   <EditDeleteButton onPress={handleEditPress}>
                     <ButtonText>수정</ButtonText>
@@ -258,7 +261,7 @@ export default function ComuPostedScreen() {
       <CommentsFooter>
         <InputBoxWrapper>
           <UserCircle2 color={getRandomPastelColor()}>
-            <UserFirstName>{postDetail.user_name}</UserFirstName>
+            <UserFirstName>{postData.user_name}</UserFirstName>
           </UserCircle2>
           {replyToCommentId ? (
             <ReplyInputBox 
@@ -401,11 +404,11 @@ const PostTitleText = styled.Text`
   font-size: 18px;
 `;
 
-const PostDetail = styled.View`
+const PostData = styled.View`
   margin-top: 10px;
 `;
 
-const PostDetailText = styled.Text`
+const PostDataText = styled.Text`
   font-family: 'Inter-Regular';
   font-size: 13px;
 `;
@@ -447,7 +450,7 @@ const IconWrapper = styled.View`
 
 const LikeIcon = styled.TouchableOpacity``;
 
-const ChatIcon = styled.View``;
+const ChatIcon = styled.TouchableOpacity``;
 
 const LikeCount = styled.Text`
   color: #E05936;

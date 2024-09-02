@@ -15,7 +15,7 @@ import { API_TOKEN } from "@env";
 const Comment = () => {
   const navigation = useNavigation();
   const route = useRoute();
-
+  console.log(route.paramsr)
   // Extract both `post_id` and `post_id_mvp` from route params
   const { post_id, post_id_mvp } = route.params;
 
@@ -27,6 +27,8 @@ const Comment = () => {
   const [newReply, setNewReply] = useState("");
   const [selectedCommentId, setSelectedCommentId] = useState(null);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  const [postData, setPostData] = useState(route.params);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -42,61 +44,26 @@ const Comment = () => {
       }
     );
 
-    fetchBlogData();
-
     return () => {
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
     };
   }, []);
 
+  useEffect(() => {
+    setPostData(route.params);
+  }, [route.params]);
+
   const handleDismissKeyboard = () => {
     Keyboard.dismiss();
     setSelectedCommentId(null); // 터치 시 답글 입력 모드를 해제
-  };
-
-  const fetchBlogData = async () => {
-    try {
-      const apiUrl = "https://api.ballog.store";
-      const response = await axios.get(
-        `${apiUrl}/board/post/${resolvedPostId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
-      setBlogData(response.data.result);
-    } catch (error) {
-      console.error("Error fetching blog data:", error);
-    }
   };
 
   const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
 
     try {
-      const apiUrl = "https://api.ballog.store";
-      await axios.post(
-        `${apiUrl}/api-utils/comment`,
-        {
-          body: newComment,
-          post_id: resolvedPostId,
-          post_user_id: blogData.user_id,
-          post_type: "blog",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
-      setNewComment("");
-      await fetchBlogData();
+      
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
@@ -112,27 +79,6 @@ const Comment = () => {
     if (!newReply.trim()) return;
 
     try {
-      const apiUrl = "https://api.ballog.store";
-      await axios.post(
-        `${apiUrl}/api-utils/reply`,
-        {
-          body: newReply,
-          post_id: resolvedPostId,
-          post_user_id: blogData.user_id,
-          comment_id: selectedCommentId, // selectedCommentId 추가
-          post_type: "blog",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
-      );
-      setNewReply("");
-      setSelectedCommentId(null); // 답글 작성 후 초기화
-      await fetchBlogData();
     } catch (error) {
       console.error("Error submitting reply:", error);
     }
