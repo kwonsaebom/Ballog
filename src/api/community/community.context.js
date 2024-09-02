@@ -10,7 +10,7 @@ const CommunityProvider = ({ children }) => {
         "created_at": "2024-08-11T08:30:14.000Z",
         img_urls: []
       })
-    const [postList, setPostList] = useState([{data: {}}]);
+    const [postList, setPostList] = useState([{data: []}]);
 
     const community_context = {
         get: async (post_id) => {
@@ -29,7 +29,6 @@ const CommunityProvider = ({ children }) => {
             }
         },
         patch: async (post_id, req) => {
-            console.log(post_id, req)
             try {
                 await community_api.patch(post_id, req);
             } catch (error) {
@@ -46,8 +45,14 @@ const CommunityProvider = ({ children }) => {
         get_list: async (type, cursor = null, page = null) => {
             try {
                 const response = await community_api.get_list(type, cursor, page);
+
+                if (response.result.totalCount  === 0) {
+                    setPostList([{data: []}])
+                } else {
+                    setPostList(response.result);
+                }
                 console.log(JSON.stringify(response.result, null, 2));
-                setPostList(response.result);
+                
             } catch (error) {
                 community_error.get_list(error);
             }

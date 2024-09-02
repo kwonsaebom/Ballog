@@ -3,7 +3,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { Feather, FontAwesome6 } from '@expo/vector-icons';
 import ComuPostListScreen from './ComuPostListScreen';
-import { PostsContext } from '../../Context API/PostsContext';
 import { communityContext } from '../../api/community/community.context';
 import Loading from '../../components/Loading';
 import Error from '../../components/Error';

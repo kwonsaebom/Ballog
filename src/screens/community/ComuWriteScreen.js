@@ -4,13 +4,11 @@ import styled from 'styled-components/native'
 import { Feather, AntDesign } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import { PostsContext } from '../../Context API/PostsContext';
 import { communityContext } from '../../api/community/community.context';
 
 export default function ComuWriteScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const {addPost, updatePost, getPostById} = useContext(PostsContext);
   const { community_context, postData, postList } = useContext(communityContext);
   const previousPost = route.params;
   const [post, setPost] = useState(() => ({
@@ -20,7 +18,6 @@ export default function ComuWriteScreen() {
     img_urls: [],
     type: previousPost.type,
   }));
-
   useEffect(() => {
     if (previousPost.post_id) {
         setPost(previousPost);
@@ -50,8 +47,7 @@ export default function ComuWriteScreen() {
         await community_context.patch(previousPost.post_id, post);
         navigation.navigate('ComuPostedScreen', {
             post_id: updatedPost_id,
-            type: post.type,
-            postData: post // 수정된 게시글 데이터를 전달
+            type: post.type
         });
     } else {
         updatedPost_id = await community_context.post(post); // 새로운 게시글을 Context에 추가

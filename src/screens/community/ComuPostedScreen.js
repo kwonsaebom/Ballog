@@ -27,11 +27,10 @@ export default function ComuPostedScreen() {
   useEffect(() => {
     const setPostData = async () => {
       await community_context.get(post_id);
-      console.log(postData);
       setSelectedType(type)
     };
     setPostData()
-  }, [route])
+  }, [])
   const userCircleColors = useMemo(() => {
     return postComments.reduce((colors, comment) => {
       colors[comment.id] = getRandomPastelColor();
@@ -50,7 +49,7 @@ export default function ComuPostedScreen() {
   const handleToggleLike = async () => {
     try {
       // 게시글의 ID를 기반으로 좋아요 상태를 토글
-      
+      await toggleLike(postData.post_id);
   } catch (error) {
       console.error('좋아요 상태를 변경하는 중 오류 발생:', error);
   }
@@ -94,13 +93,15 @@ export default function ComuPostedScreen() {
 
   const handleDeletePress = async () => {
     try {
+      
       await community_context.delete(postData.post_id);
-      await community_context.get_list(type)
-      console.log(`Post with ID ${postData.post_id} deleted successfully.`);
+      await community_context.get_list(selectedType);
+      
       navigation.navigate("MainTabs", {
-        screen: '커뮤니티',
-        params: { type: selectedType }
+          screen: '커뮤니티',
+          params: { type: selectedType }
       });
+      
     } catch (err) {
       console.error('Error deleting post:', err);
     }
