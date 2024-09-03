@@ -4,8 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import useFonts from './src/hooks/useFonts';
 import StackNavigator from './src/navigation/StackNavigator';
-import { PostsProvider } from './src/Context API/PostsContext';
 import { CommentsProvider } from './src/Context API/CommentsContext';
+import { CommunityProvider } from './src/api/community/community.context';
 
 import NotificationBanner from './src/screens/NotificationBanner'
 import { store } from './src/utils/secureStore'
@@ -19,13 +19,13 @@ export default function App() {
   }
 
   return (
-    <PostsProvider>
-      <NotificationBanner/>
-      <CommentsProvider>
-        <StackNavigator />
-        <StatusBar style="auto" />
-      </CommentsProvider>
-    </PostsProvider>
+    <CommentsProvider>
+      <CommunityProvider>
+        <NotificationBanner/>
+          <StackNavigator />
+          <StatusBar style="auto" />
+      </CommunityProvider>
+    </CommentsProvider>
   );
 }
 
