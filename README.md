@@ -58,4 +58,5 @@
 - 팀 관련 굿즈, 혹은 야구 용품 거래
 
 <h1> 🚀 기술 스택 🚀 </h1>
-<img width="1252" alt="image" src="https://github.com/user-attachments/assets/8c2f3e2d-6bf1-47e3-bd00-3ad289850409">
+![image](https://github.com/user-attachments/assets/1fb12324-4052-44b7-bb08-0b99768068d7)
+
