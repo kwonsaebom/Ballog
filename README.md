@@ -60,5 +60,3 @@
 <h1> 🚀 기술 스택 🚀 </h1>
 <img width="746" alt="image" src="https://github.com/user-attachments/assets/f566465c-8c5f-4a94-b108-2834bef9250c">
 
-
-
